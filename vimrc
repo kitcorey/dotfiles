@@ -25,6 +25,7 @@ if v:version >= 700
     Plugin 'xolox/vim-notes'
     Plugin 'ludovicchabant/vim-lawrencium'
     Plugin 'tpope/vim-fugitive'
+    Plugin 'derekwyatt/vim-scala'
 endif
 
 "The following require vim version >= 7.2
@@ -210,7 +211,7 @@ nnoremap <leader>gc :call GitMercurial("Gcommit -v -q", "Hgcommit")<CR>
 " :Gread is a variant of git checkout -- filename that operates on the buffer rather than the filename
 nnoremap <leader>gr :Gread<CR>
 nnoremap <leader>gw :Gwrite<CR>
-nnoremap <leader>ga :silent! GitMercurial("Git add %:p", "Hg add %:p")<CR>:redraw!<CR>
+nnoremap <leader>ga :call GitMercurial("Git add %:p", "Hg add %:p")<CR>:redraw!<CR>
 nnoremap <Leader>gl :call GitMercurial("silent! Glog", "Hglog")<CR>
 
 " Use a spell file for storing dictionary exceptions
