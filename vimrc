@@ -26,6 +26,7 @@ if v:version >= 700
     Plugin 'ludovicchabant/vim-lawrencium'
     Plugin 'tpope/vim-fugitive'
     Plugin 'derekwyatt/vim-scala'
+    Plugin 'vim-scripts/vcscommand.vim'
 endif
 
 "The following require vim version >= 7.2
@@ -202,7 +203,7 @@ endfunction
 
 nnoremap <leader>gs :call GitMercurial("Gstatus", "Hgstatus")<CR>
 nnoremap <leader>gd :call GitMercurial("Gvdiff", "Hgvdiff")<CR>
-nnoremap <leader>gb :call GitMercurial("Gblame", "Hgblame")<CR>
+nnoremap <leader>gb :call GitMercurial("Gblame", "VCSBlame!")<CR>
 if !exists(":Greview")
     command Greview :Git! diff --staged
 endif
