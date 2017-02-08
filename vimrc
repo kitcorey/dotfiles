@@ -219,3 +219,6 @@ nnoremap <Leader>gl :call GitMercurial("silent! Glog", "Hglog")<CR>
 set spellfile=~/.vim/spell/exceptions.utf-8.add
 " Set up spell checking by default
 set spell spelllang=en_us
+
+" proper indentation for yaml files with home assistant
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
