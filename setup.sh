@@ -4,7 +4,7 @@ usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
 setup_vim() {
     destination=~/.vim/bundle/Vundle.vim
     if [ ! -d "$destination" ] ; then
-        git clone https://github.com/tmux-plugins/tpm $destination
+        git clone https://github.com/VundleVim/Vundle.vim.git $destination
     fi
     cp $cp_options vimrc ~/.vimrc
 }
