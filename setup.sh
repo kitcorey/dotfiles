@@ -23,8 +23,12 @@ setup_git() {
     git config --global core.excludesfile $gitignore
 }
 
+setup_bash() {
+    cp $cp_options inputrc ~/.inputrc
+}
 
-cp_options="--no-clobber"
+# standard no-clobber option for cp
+cp_options="-n"
 while getopts ":o" o; do
     case "${o}" in
         o)
@@ -41,3 +45,4 @@ shift $((OPTIND-1))
 setup_vim
 setup_tmux
 setup_git
+setup_bash
