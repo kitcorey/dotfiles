@@ -32,7 +32,6 @@ cp_options="-n"
 while getopts ":o" o; do
     case "${o}" in
         o)
-            echo "HI"
             cp_options=""
             ;;
         *)
