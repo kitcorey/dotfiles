@@ -62,9 +62,6 @@ endif
 " with right-click in putty in insert mode, and scrolling to work in normal mode
 set mouse=n
 
-" Enable syntax highlighting
-syntax on
-
 " Allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
@@ -172,8 +169,12 @@ if ! has('gui_running')
   augroup END
 endif
 
+" Enable syntax highlighting
+syntax enable
+
 if v:version >= 700
-    set t_Co=256
+    "Uncomment to force using 256 colors
+    "set t_Co=256
     let g:solarized_termcolors=16
     silent colorscheme solarized
     set background=dark
