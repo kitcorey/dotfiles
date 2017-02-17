@@ -1,0 +1,3 @@
+# SET style guide
+[flake8]
+max-line-length = 105

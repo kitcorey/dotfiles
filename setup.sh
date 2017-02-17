@@ -7,6 +7,8 @@ setup_vim() {
         git clone https://github.com/VundleVim/Vundle.vim.git $destination
     fi
     cp $cp_options vimrc ~/.vimrc
+    mkdir -p ~/.config
+    cp $cp_options flake8 ~/.config/flake8
 }
 
 setup_tmux() {
