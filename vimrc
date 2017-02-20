@@ -173,8 +173,13 @@ endif
 syntax enable
 
 if v:version >= 700
-    "Uncomment to force using 256 colors
-    "set t_Co=256
+    "Force using 16 colors
+    set t_Co=16
+
+    "Disable background color erase (BCE)
+    "http://superuser.com/questions/508198/which-is-the-correct-way-to-config-the-term-and-tmux
+    set t_ut=
+
     let g:solarized_termcolors=16
     silent colorscheme solarized
     set background=dark
