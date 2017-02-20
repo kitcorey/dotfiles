@@ -3,8 +3,14 @@ usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
 
 setup_vim() {
     destination=~/.vim/bundle/Vundle.vim
+    created=false
     if [ ! -d "$destination" ] ; then
         git clone https://github.com/VundleVim/Vundle.vim.git $destination
+        created=true
+    fi
+    if [ $overwrite = true ] || [ $created = true ] ; then
+        #Install all vundle plugins
+        vim +PluginInstall +qall
     fi
     cp $cp_options vimrc ~/.vimrc
 
@@ -36,10 +42,12 @@ setup_bash() {
 
 # standard no-clobber option for cp
 cp_options="-n"
+overwrite=false
 while getopts ":o" o; do
     case "${o}" in
         o)
             cp_options=""
+            overwrite=true
             ;;
         *)
             usage
