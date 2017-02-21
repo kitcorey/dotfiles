@@ -31,17 +31,20 @@ setup_csh() {
 }
 
 setup_git() {
-    cp $cp_options gitignore $HOME/.gitignore
     gitignore=$HOME/.gitignore
+    if [ ! -e $gitignore ] || [ $overwrite = true ] ; then
+        append_if_new gitignore $gitignore
+    fi
     git config --global core.excludesfile $gitignore
 }
 
 setup_bash() {
     cp $cp_options inputrc $HOME/.inputrc
-    first_line=$(head -n 1 bashrc)
-    if ! grep -q -F "$first_line" $HOME/.bashrc; then
-        append_with_newline bashrc $HOME/.bashrc
-        mkdir -p $HOME/.shellrc/bashrc.d
+    bashrc=$HOME/.bashrc
+    if [ ! -e $bashrc ] || [ $overwrite = true ] ; then
+        if append_if_new bashrc $bashrc; then
+            mkdir -p $HOME/.shellrc/bashrc.d
+        fi
     fi
 }
 
@@ -52,6 +55,24 @@ append_with_newline() {
         exit
     fi
     echo "$(awk 'FNR==1{print ""}1' $1)" >> $2
+}
+
+append_if_new() {
+    # Append file $1 to file $2 if the first line of $1 is not in $2
+    first_line=$(head -n 1 bashrc)
+    if [ $# -ne 2 ]; then
+        echo "Not enough arguments provided to $FUNCNAME"
+        exit
+    fi
+    src=$1
+    dst=$2
+    first_line=$(head -n 1 $src)
+    if ! grep -q -F "$first_line" $dst; then
+        append_with_newline $src $dst
+        return 1
+    else
+        return 0
+    fi
 }
 
 # standard no-clobber option for cp
