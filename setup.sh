@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
 
 setup_vim() {
@@ -48,6 +47,10 @@ setup_bash() {
 
 append_with_newline() {
     # Append file $1 to file $2 with a newline in between
+    if [ $# -ne 2 ]; then
+        echo "Not enough arguments provided to $FUNCNAME"
+        exit
+    fi
     echo "$(awk 'FNR==1{print ""}1' $1)" >> $2
 }
 
@@ -67,8 +70,8 @@ while getopts ":o" o; do
 done
 shift $((OPTIND-1))
 
-#setup_vim
-#setup_tmux
-#setup_git
+setup_vim
+setup_tmux
+setup_git
 setup_bash
-#setup_csh
+setup_csh
