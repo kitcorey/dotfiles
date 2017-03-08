@@ -185,6 +185,12 @@ if v:version >= 700
     set background=dark
 endif
 
+if v:version >= 700
+    " Matchit is already installed in newer versions of vim.
+    " Configure matchit so that it goes from opening tag to closing tag
+    au FileType html,eruby,rb,sh,css,js,xml runtime! macros/matchit.vim
+endif
+
 noremap a :set invnumber<cr>"
 "Turn off automatic indentation for perl and python files when using # 
 "for comments

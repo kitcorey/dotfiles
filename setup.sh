@@ -23,7 +23,7 @@ setup_tmux() {
     if [ ! -d "$destination" ] ; then
         git clone https://github.com/tmux-plugins/tpm $destination
     fi
-    cp $cp_options tmux.conf $HOME/.tmux.conf
+    ln -s $(pwd)/tmux.conf $HOME/.tmux.conf
 }
 
 setup_csh() {
@@ -33,6 +33,7 @@ setup_csh() {
 setup_git() {
     gitignore=$HOME/.gitignore
     if [ ! -e $gitignore ] || [ $overwrite = true ] ; then
+        touch $gitignore
         append_if_new gitignore $gitignore
     fi
     git config --global core.excludesfile $gitignore
