@@ -58,9 +58,15 @@ if has("folding")
     set foldlevel=99
 endif
 
+" Scrolling
 " Enable the mouse only in normal mode.  This allows copy/paste to still work
 " with right-click in putty in insert mode, and scrolling to work in normal mode
 set mouse=n
+" Keep three lines between the cursor and the edge of the screen
+set scrolloff=3
+" Move between displayed lines instead of physical lines
+nnoremap k gk
+nnoremap j gj
 
 " Allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -119,9 +125,6 @@ nnoremap <space>s :Unite -quick-match -silent buffer<cr>
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
-  " For all text files set 'textwidth' to 78 characters.
-  "autocmd FileType text setlocal textwidth=78
-
   " When editing a file, always jump to the last known cursor position.
   " Don't do it when the position is invalid or when inside an event handler
   " (happens when dropping a file on gvim).
@@ -131,6 +134,20 @@ if has("autocmd")
     \ endif
 endif " has("autocmd")
 
+" persistent undo
+if has('persistent_undo')
+    if !isdirectory($HOME."/.vim/undo")
+        call mkdir($HOME."/.vim/undo", "p")
+    endif
+    set undodir=~/.vim/undo
+    set undofile
+    set undolevels=1000 "maximum number of changes that can be undone
+    set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+endif
+
+""""""""""""""""""""""""""""""
+" General shortcuts
+""""""""""""""""""""""""""""""
 " Print the name of the current function by hitting f in normal mode
 fun! ShowFuncName()
   let lnum = line(".")
@@ -141,6 +158,9 @@ fun! ShowFuncName()
   call search("\\%" . lnum . "l" . "\\%" . col . "c")
 endfun
 map f :call ShowFuncName() <CR>
+
+" Show line numbers with a in normal mode
+noremap a :set invnumber<cr>"
 
 """"""""""""""""""""""""""""""
 " airline
@@ -159,7 +179,7 @@ let g:airline#extensions#tabline#tab_min_count = 2
 let g:airline_detect_spell=0
 let g:airline#extensions#branch#enabled = 1
 
-"fix delay when pressing escape with powerline
+"fix delay when pressing escape with airline
 if ! has('gui_running')
   set ttimeoutlen=10
   augroup FastEscape
@@ -172,6 +192,9 @@ endif
 " Enable syntax highlighting
 syntax enable
 
+""""""""""""""""""""""""""""""
+" solarized
+""""""""""""""""""""""""""""""
 if v:version >= 700
     "Force using 16 colors
     set t_Co=16
@@ -185,13 +208,12 @@ if v:version >= 700
     set background=dark
 endif
 
+" Matchit is already installed in newer versions of vim.
+" Configure matchit so that it goes from opening tag to closing tag
 if v:version >= 700
-    " Matchit is already installed in newer versions of vim.
-    " Configure matchit so that it goes from opening tag to closing tag
     runtime macros/matchit.vim
 endif
 
-noremap a :set invnumber<cr>"
 "Turn off automatic indentation for perl and python files when using # 
 "for comments
 autocmd BufRead *.py inoremap # X<c-h>#
@@ -216,7 +238,6 @@ function! GitMercurial(git_name, hg_name)
             execute a:git_name
         endif
 endfunction
-
 nnoremap <leader>gs :call GitMercurial("Gstatus", "Hgstatus")<CR>
 nnoremap <leader>gd :call GitMercurial("Gvdiff", "Hgvdiff")<CR>
 nnoremap <leader>gb :call GitMercurial("Gblame", "VCSBlame!")<CR>
