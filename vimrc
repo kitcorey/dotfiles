@@ -188,7 +188,7 @@ endif
 if v:version >= 700
     " Matchit is already installed in newer versions of vim.
     " Configure matchit so that it goes from opening tag to closing tag
-    au FileType html,eruby,rb,sh,css,js,xml runtime! macros/matchit.vim
+    runtime macros/matchit.vim
 endif
 
 noremap a :set invnumber<cr>"
@@ -200,11 +200,15 @@ nnoremap <M-,> :call search('^'. matchstr(getline('.'), '\(^\s*\)') .'\%<' . lin
 nnoremap <M-.> :call search('^'. matchstr(getline('.'), '\(^\s*\)') .'\%>' . line('.') . 'l\S', 'e')<CR>
 
 """"""""""""""""""""""""""""""
+" Highlight long lines
+"""""""""""""""""""""""""""""
+autocmd FileType python,c,cpp,vim let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
+
+""""""""""""""""""""""""""""""
 " fugitive/lawrencium
 """"""""""""""""""""""""""""""
 " Function to call a fugitive function if the current file is under a git
 " repository, and call the equivalent lawrencium command otherwise
-au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
 function! GitMercurial(git_name, hg_name)
         if fugitive#head("show detached") == ""
             execute a:hg_name
@@ -221,7 +225,8 @@ if !exists(":Greview")
 endif
 nnoremap <leader>gv :Greview<cr>
 nnoremap <leader>gc :call GitMercurial("Gcommit -v -q", "Hgcommit")<CR>
-" :Gread is a variant of git checkout -- filename that operates on the buffer rather than the filename
+" :Gread is a variant of git checkout -- filename that operates on the buffer
+" instead of the filename
 nnoremap <leader>gr :Gread<CR>
 nnoremap <leader>gw :Gwrite<CR>
 nnoremap <leader>ga :call GitMercurial("Git add %:p", "Hg add %:p")<CR>:redraw!<CR>
