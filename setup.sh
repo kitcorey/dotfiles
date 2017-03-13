@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
 
 setup_vim() {
@@ -43,11 +44,19 @@ setup_bash() {
     cp $cp_options inputrc $HOME/.inputrc
     bashrc=$HOME/.bashrc
     if [ ! -e $bashrc ] || [ $overwrite = true ] ; then
-        if append_if_new bashrc $bashrc; then
-            mkdir -p $HOME/.shellrc/bashrc.d
-        fi
+        append_if_new bashrc $bashrc
+        mkdir -p $HOME/.shellrc/bashrc.d
     fi
 }
+
+setup_zsh() {
+    declare zshrc="$HOME/.zshrc"
+    if [[ ! -e $zshrc || $overwrite = true ]] ; then
+        append_if_new zshrc $zshrc
+        mkdir -p $HOME/.shellrc/zshrc.d
+    fi
+}
+
 
 append_with_newline() {
     # Append file $1 to file $2 with a newline in between
@@ -97,3 +106,4 @@ setup_tmux
 setup_git
 setup_bash
 setup_csh
+setup_zsh
