@@ -1,0 +1,1 @@
+/home/kit/.shellrc/bashrc.d/sf.bash
