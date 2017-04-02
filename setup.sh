@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
 
 setup_vim() {
@@ -79,9 +78,9 @@ append_if_new() {
     first_line=$(head -n 1 $src)
     if ! grep -q -F "$first_line" $dst; then
         append_with_newline $src $dst
-        return 1
-    else
         return 0
+    else
+        return 1
     fi
 }
 
