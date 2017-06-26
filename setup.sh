@@ -43,8 +43,8 @@ setup_bash() {
     cp $cp_options inputrc $HOME/.inputrc
     bashrc=$HOME/.bashrc
     if [ ! -e $bashrc ] || [ $overwrite = true ] ; then
-        append_if_new bashrc $bashrc
         mkdir -p $HOME/.shellrc/bashrc.d
+        append_if_new bashrc $bashrc
     fi
 }
 
