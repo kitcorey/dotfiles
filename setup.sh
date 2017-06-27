@@ -11,8 +11,8 @@ setup_vim() {
     if [ $overwrite = true ] || [ $created = true ] ; then
         #Install all vundle plugins
         vim +PluginInstall +qall
+        ln -s $(pwd)/vimrc $HOME/.vimrc
     fi
-    cp $cp_options vimrc $HOME/.vimrc
 
     mkdir -p $HOME/.config
     cp $cp_options flake8 $HOME/.config/flake8
