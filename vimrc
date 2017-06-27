@@ -45,7 +45,7 @@ endif
 "The following require vim version >= 7.3
 if v:version > '703'
     Plugin 'vim-scripts/ZoomWin'
-    Plugin 'Valloric/YouCompleteMe'
+    "Plugin 'Valloric/YouCompleteMe'
     Plugin 'lyuts/vim-rtags'
 endif
 
