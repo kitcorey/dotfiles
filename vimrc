@@ -27,6 +27,8 @@ if v:version >= 700
     Plugin 'tpope/vim-fugitive'
     Plugin 'derekwyatt/vim-scala'
     Plugin 'vim-scripts/vcscommand.vim'
+    Plugin 'scrooloose/nerdtree'
+    Plugin 'Xuyuanp/nerdtree-git-plugin'
 endif
 
 "The following require vim version >= 7.2
@@ -34,13 +36,17 @@ if v:version > '702'
     " This plugin will still need to be compiled manually
     Plugin 'Shougo/vimproc.vim'
     Plugin 'Shougo/unite.vim'
+    Plugin 'Shougo/neoyank.vim'
     Plugin 'vim-airline/vim-airline'
     Plugin 'vim-airline/vim-airline-themes'
+    Plugin 'ryanoasis/vim-devicons'
 endif
 
 "The following require vim version >= 7.3
 if v:version > '703'
     Plugin 'vim-scripts/ZoomWin'
+    Plugin 'Valloric/YouCompleteMe'
+    Plugin 'lyuts/vim-rtags'
 endif
 
 " All of your Plugins must be added before the following line
@@ -238,7 +244,28 @@ nnoremap <M-.> :call search('^'. matchstr(getline('.'), '\(^\s*\)') .'\%>' . lin
 """"""""""""""""""""""""""""""
 " Highlight long lines
 """""""""""""""""""""""""""""
-autocmd FileType python,c,cpp,vim let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
+autocmd FileType vim let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
+autocmd FileType python let w:m2=matchadd('ErrorMsg', '\%>105v.\+', -1)
+
+""""""""""""""""""""""""""""""
+" YouCompleteMe
+""""""""""""""""""""""""""""""
+let g:ycm_filetype_whitelist = { 'c': 1, 'cpp': 1 }
+let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
+let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
+let g:ycm_extra_conf_globlist = ['~/repos/*']
+" completions
+set completeopt=longest,menuone
+set wildmode=longest,list:longest
+
+""""""""""""""""""""""""""""""
+" NERDTree
+""""""""""""""""""""""""""""""
+" Open NerdTree if vim is started without any files
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" Toggle NERDTree with C-n
+map <C-n> :NERDTreeToggle<CR>
 
 """"""""""""""""""""""""""""""
 " fugitive/lawrencium
@@ -271,6 +298,11 @@ nnoremap <Leader>gl :call GitMercurial("silent! Glog", "Hglog")<CR>
 set spellfile=~/.vim/spell/exceptions.utf-8.add
 " Set up spell checking by default
 set spell spelllang=en_us
+
+" Use C-s to save the current file (only works if flow control is disabled)
+noremap <silent> <C-s>          :update<CR>
+vnoremap <silent> <C-s>         <C-C>:update<CR>
+inoremap <silent> <C-s>         <C-O>:update<CR>
 
 " proper indentation for yaml files with home assistant
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
