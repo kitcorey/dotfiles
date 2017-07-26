@@ -29,10 +29,11 @@ if v:version >= 700
     Plugin 'vim-scripts/vcscommand.vim'
     Plugin 'scrooloose/nerdtree'
     Plugin 'Xuyuanp/nerdtree-git-plugin'
+    Plugin 'mileszs/ack.vim'
 endif
 
 "The following require vim version >= 7.2
-if v:version > '702'
+if v:version >= '702'
     " This plugin will still need to be compiled manually
     Plugin 'Shougo/vimproc.vim'
     Plugin 'Shougo/unite.vim'
@@ -43,10 +44,15 @@ if v:version > '702'
 endif
 
 "The following require vim version >= 7.3
-if v:version > '703'
-    Plugin 'vim-scripts/ZoomWin'
+if v:version >= '703'
     "Plugin 'Valloric/YouCompleteMe'
     Plugin 'lyuts/vim-rtags'
+endif
+
+"The following require vim version >= 7.4
+if v:version >= '704'
+    Plugin 'junegunn/fzf'
+    Plugin 'junegunn/fzf.vim' "Depends on fzf
 endif
 
 " All of your Plugins must be added before the following line
@@ -68,6 +74,8 @@ endif
 " Enable the mouse only in normal mode.  This allows copy/paste to still work
 " with right-click in putty in insert mode, and scrolling to work in normal mode
 set mouse=n
+" Force vim to use advanced mouse features from the future (dragging)
+set ttymouse=xterm2
 " Keep three lines between the cursor and the edge of the screen
 set scrolloff=3
 " Move between displayed lines instead of physical lines
@@ -88,7 +96,7 @@ set noerrorbells visualbell t_vb=
 autocmd GUIEnter * set visualbell t_vb=
 
 " Added to conform with coding standards.
-set tabstop=8	    " tabs show up as 8 spaces
+set tabstop=4	    " tabs show up as 4 spaces
 set softtabstop=4   " make fake tabs (4 spaces) feel like real tabs
 set shiftwidth=4    " insert 4 spaces instead of a tab
 set expandtab	    " always insert spaces instead of tabs
@@ -97,6 +105,7 @@ set smartcase	    " search is case insensitive if all lower case
 set hlsearch        " when searching, highlight instances of search phrase
 set modelines=0     " don't mess with my editor, people!!
 au filetype make setlocal noexpandtab " insert real tabs in makefiles
+set cinoptions+=g0  " don't indent access specifiers
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -113,15 +122,28 @@ let g:zoomwin_localoptlist = []
 " Remap the flake8 command to F8 (which really should have been the default!)
 autocmd FileType python map <buffer> <F8> :call Flake8()<CR>
 
+
+""""""""""""""""""""""""""""""
+" ack.vim
+""""""""""""""""""""""""""""""
+let g:ackprg = 'ag --nogroup --nocolor --column'
+map <space>/ :Ag<Space>
+
+""""""""""""""""""""""""""""""
+" fzf.vim
+""""""""""""""""""""""""""""""
+nnoremap <c-p> :Files<cr>
+
 """"""""""""""""""""""""""""""
 " unite.vim
 """"""""""""""""""""""""""""""
-"search local directory recursively
-nnoremap <C-p> :Unite -start-insert file_rec/async<cr>
+"search local directory recursively (handled by fzf)
+"nnoremap <C-p> :Unite -start-insert file_rec/async<cr>
 "search local directory non-recursively
 nnoremap <leader>f :Unite -silent -start-insert file<cr>
 "grep in current directory
-nnoremap <space>/ :Unite grep:.<cr>
+"grep local directory recusively (handled by ack)
+"nnoremap <space>/ :Unite grep:.<cr>
 "let g:unite_source_grep_command = "ggrep"
 let g:unite_source_history_yank_enable = 1
 "search yanked text
@@ -179,6 +201,10 @@ fun! ShowFuncName()
 endfun
 map f :call ShowFuncName() <CR>
 
+" Maximize the current window (by moving to a new tab)
+"nnoremap <C-W>m :wincmd _<Bar>wincmd <Bar><CR>
+nnoremap <C-W>m :tabe %<CR>
+
 " Show line numbers with a in normal mode
 noremap a :set invnumber<cr>"
 
@@ -217,15 +243,15 @@ syntax enable
 """"""""""""""""""""""""""""""
 if v:version >= 700
     "Force using 16 colors
-    set t_Co=16
+    "set t_Co=16
 
     "Disable background color erase (BCE)
     "http://superuser.com/questions/508198/which-is-the-correct-way-to-config-the-term-and-tmux
-    set t_ut=
+    "set t_ut=
 
-    let g:solarized_termcolors=16
-    silent colorscheme solarized
+    call togglebg#map("<Leader>bg")
     set background=dark
+    colorscheme solarized
 endif
 
 " Matchit is already installed in newer versions of vim.
@@ -244,8 +270,8 @@ nnoremap <M-.> :call search('^'. matchstr(getline('.'), '\(^\s*\)') .'\%>' . lin
 """"""""""""""""""""""""""""""
 " Highlight long lines
 """""""""""""""""""""""""""""
-autocmd FileType vim let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
-autocmd FileType python let w:m2=matchadd('ErrorMsg', '\%>105v.\+', -1)
+"autocmd FileType vim let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
+"autocmd FileType python let w:m2=matchadd('ErrorMsg', '\%>105v.\+', -1)
 
 """"""""""""""""""""""""""""""
 " YouCompleteMe
@@ -259,13 +285,27 @@ set completeopt=longest,menuone
 set wildmode=longest,list:longest
 
 """"""""""""""""""""""""""""""
+" rtags
+""""""""""""""""""""""""""""""
+" Use the quickfix window instead
+let g:rtagsUseLocationList = 0
+
+""""""""""""""""""""""""""""""
 " NERDTree
 """"""""""""""""""""""""""""""
+let g:NERDTreeWinPos = "left"
+let g:NERDTreeHighlightCursorline = 2
+let g:NERDTreeChDirMode = 1 " NERDTree will change vim's CWD
+let g:NERDTreeMouseMode = 2 " Single click opens directories
+let g:NERDTreeIgnore = ['\.orig$', '\.pyc$']
+"let g:NERDTreeQuitOnOpen = 1 " Close NERDTree after opening a file
+let g:NERDTreeWinSize = 40 " Starting NERDTree size big enough for most filenames
 " Open NerdTree if vim is started without any files
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 " Toggle NERDTree with C-n
 map <C-n> :NERDTreeToggle<CR>
+
 
 """"""""""""""""""""""""""""""
 " fugitive/lawrencium
@@ -306,3 +346,12 @@ inoremap <silent> <C-s>         <C-O>:update<CR>
 
 " proper indentation for yaml files with home assistant
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+
+" format tabs as >--- when using :set list
+set listchars=tab:>-
+
+"vim-devicons should be loaded last
+if v:version > '702'
+    let g:webdevicons_enable = 0
+    let g:webdevicons_conceal_nerdtree_brackets = 1
+endif

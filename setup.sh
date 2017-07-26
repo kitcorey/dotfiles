@@ -39,6 +39,7 @@ setup_git() {
     git config --global core.excludesfile $gitignore
     git config --global user.email kitcorey@users.noreply.github.com
     git config --global user.name "Kit Corey"
+    git config --global  alias.lg 'log --graph --oneline --decorate --all'
 }
 
 setup_bash() {
@@ -67,6 +68,11 @@ setup_zsh() {
 
 setup_repos() {
     mkdir -p $HOME/repos/github
+}
+
+setup_fzf() {
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install --bin
 }
 
 append_with_newline() {
@@ -119,3 +125,4 @@ setup_bash
 setup_csh
 setup_zsh
 setup_repos
+setup_fzf
