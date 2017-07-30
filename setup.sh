@@ -19,10 +19,13 @@ setup_vim() {
 }
 
 setup_tmux() {
-    destination=$HOME/.tmux/plugins/tpm
-    if [ ! -d "$destination" ] ; then
-        git clone https://github.com/tmux-plugins/tpm $destination
-        ln -s $(pwd)/tmux.conf $HOME/.tmux.conf
+    declare plugins_destination=$HOME/.tmux/plugins/tpm
+    declare tmux_conf=$HOME/.tmux.conf
+    if [ ! -d "$plugins_destination" ] ; then
+        git clone https://github.com/tmux-plugins/tpm $plugins_destination
+    fi
+    if [ ! -e $tmux_conf ] ; then
+        ln -s $(pwd)/tmux.conf $tmux_conf
     fi
 }
 
