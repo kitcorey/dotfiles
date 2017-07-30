@@ -295,7 +295,7 @@ let g:rtagsUseLocationList = 0
 """"""""""""""""""""""""""""""
 let g:NERDTreeWinPos = "left"
 let g:NERDTreeHighlightCursorline = 2
-let g:NERDTreeChDirMode = 1 " NERDTree will change vim's CWD
+let g:NERDTreeChDirMode = 2 " NERDTree will change vim's CWD
 let g:NERDTreeMouseMode = 2 " Single click opens directories
 let g:NERDTreeIgnore = ['\.orig$', '\.pyc$']
 "let g:NERDTreeQuitOnOpen = 1 " Close NERDTree after opening a file

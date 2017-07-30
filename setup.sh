@@ -63,6 +63,10 @@ setup_zsh() {
         # Install oh-my-zsh
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
         curl https://raw.githubusercontent.com/oskarkrawczyk/honukai-iterm/master/honukai.zsh-theme -o $HOME/.oh-my-zsh/themes/honukai.zsh-theme
+
+        # Add zsh-dircolors as a plugin to oh-my-zsh
+        declare ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
+        git clone git://github.com/joel-porquet/zsh-dircolors-solarized $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
     fi
 }
 
