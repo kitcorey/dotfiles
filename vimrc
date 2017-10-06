@@ -75,7 +75,11 @@ endif
 " with right-click in putty in insert mode, and scrolling to work in normal mode
 set mouse=n
 " Force vim to use advanced mouse features from the future (dragging)
-set ttymouse=xterm2
+if has("mouse_sgr")
+    set ttymouse=sgr
+else
+    set ttymouse=xterm2
+end
 " Keep three lines between the cursor and the edge of the screen
 set scrolloff=3
 " Move between displayed lines instead of physical lines
