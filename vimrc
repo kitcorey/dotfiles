@@ -28,8 +28,14 @@ if v:version >= 700
     Plugin 'derekwyatt/vim-scala'
     Plugin 'vim-scripts/vcscommand.vim'
     Plugin 'scrooloose/nerdtree'
+    "Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
     Plugin 'Xuyuanp/nerdtree-git-plugin'
+    Plugin 'f4t-t0ny/nerdtree-hg-plugin'
     Plugin 'mileszs/ack.vim'
+    Plugin 'Rykka/riv.vim'
+    Plugin 'chazy/cscope_maps'
+    Plugin 'tpope/vim-abolish'
+    Plugin 'chrisbra/csv.vim'
 endif
 
 "The following require vim version >= 7.2
@@ -40,7 +46,6 @@ if v:version >= '702'
     Plugin 'Shougo/neoyank.vim'
     Plugin 'vim-airline/vim-airline'
     Plugin 'vim-airline/vim-airline-themes'
-    Plugin 'ryanoasis/vim-devicons'
 endif
 
 "The following require vim version >= 7.3
@@ -55,9 +60,15 @@ if v:version >= '704'
     Plugin 'junegunn/fzf.vim' "Depends on fzf
 endif
 
+if v:version >= '702'
+    Plugin 'ryanoasis/vim-devicons'
+endif
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+let g:webdevicons_enable = 0
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -89,10 +100,9 @@ nnoremap j gj
 " Allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-set autoindent		" always set autoindenting on
+set hidden
 set backup		" keep a backup file
 set history=50		" keep 50 lines of command line history
-set ruler		" show the line/column at the bottom of the file
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
 " Completely disable bell
@@ -100,16 +110,19 @@ set noerrorbells visualbell t_vb=
 autocmd GUIEnter * set visualbell t_vb=
 
 " Added to conform with coding standards.
+set autoindent		" always set autoindenting on
 set tabstop=4	    " tabs show up as 4 spaces
 set softtabstop=4   " make fake tabs (4 spaces) feel like real tabs
 set shiftwidth=4    " insert 4 spaces instead of a tab
 set expandtab	    " always insert spaces instead of tabs
 set ignorecase      " needed for smartcase
-set smartcase	    " search is case insensitive if all lower case
-set hlsearch        " when searching, highlight instances of search phrase
 set modelines=0     " don't mess with my editor, people!!
 au filetype make setlocal noexpandtab " insert real tabs in makefiles
 set cinoptions+=g0  " don't indent access specifiers
+
+" Search options
+set smartcase	    " search is case insensitive if all lower case
+set hlsearch        " when searching, highlight instances of search phrase
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -131,7 +144,7 @@ autocmd FileType python map <buffer> <F8> :call Flake8()<CR>
 " ack.vim
 """"""""""""""""""""""""""""""
 let g:ackprg = 'ag --nogroup --nocolor --column'
-map <space>/ :Ag<Space>
+nnoremap <space>/ :Ag<Space>
 
 """"""""""""""""""""""""""""""
 " fzf.vim
@@ -161,7 +174,7 @@ if has("autocmd")
   " Don't do it when the position is invalid or when inside an event handler
   " (happens when dropping a file on gvim).
   autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
     \   exe "normal g`\"" |
     \ endif
 endif " has("autocmd")
@@ -207,7 +220,7 @@ map f :call ShowFuncName() <CR>
 
 " Maximize the current window (by moving to a new tab)
 "nnoremap <C-W>m :wincmd _<Bar>wincmd <Bar><CR>
-nnoremap <C-W>m :tabe %<CR>
+nnoremap <C-W>m :tab split<CR>
 
 " Show line numbers with a in normal mode
 noremap a :set invnumber<cr>"
@@ -217,8 +230,9 @@ noremap a :set invnumber<cr>"
 """"""""""""""""""""""""""""""
 set encoding=utf-8
 set laststatus=2
-let g:airline_theme             = 'solarized'
+set noruler		" Disable the builtin line/column ruler at the bottom of the file
 set noshowmode
+let g:airline_theme             = 'solarized'
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -226,8 +240,8 @@ let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline#extensions#tabline#tab_min_count = 2
-let g:airline_detect_spell=0
 let g:airline#extensions#branch#enabled = 1
+let g:airline_detect_spell=1
 
 "fix delay when pressing escape with airline
 if ! has('gui_running')
@@ -246,13 +260,6 @@ syntax enable
 " solarized
 """"""""""""""""""""""""""""""
 if v:version >= 700
-    "Force using 16 colors
-    "set t_Co=16
-
-    "Disable background color erase (BCE)
-    "http://superuser.com/questions/508198/which-is-the-correct-way-to-config-the-term-and-tmux
-    "set t_ut=
-
     call togglebg#map("<Leader>bg")
     set background=dark
     colorscheme solarized
@@ -304,6 +311,17 @@ let g:NERDTreeMouseMode = 2 " Single click opens directories
 let g:NERDTreeIgnore = ['\.orig$', '\.pyc$']
 "let g:NERDTreeQuitOnOpen = 1 " Close NERDTree after opening a file
 let g:NERDTreeWinSize = 40 " Starting NERDTree size big enough for most filenames
+let g:NERDTreeIndicatorMap = {
+                \ 'Modified'  : '✗',
+                \ 'Staged'    : '✚',
+                \ 'Untracked' : '✭',
+                \ 'Renamed'   : '➜',
+                \ 'Unmerged'  : '═',
+                \ 'Deleted'   : '✖',
+                \ 'Dirty'     : '✗',
+                \ 'Clean'     : '✔︎',
+                \ 'Unknown'   : '?'
+                \ }
 " Open NerdTree if vim is started without any files
 " autocmd StdinReadPre * let s:std_in=1
 " autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
@@ -338,10 +356,12 @@ nnoremap <leader>gw :Gwrite<CR>
 nnoremap <leader>ga :call GitMercurial("Git add %:p", "Hg add %:p")<CR>:redraw!<CR>
 nnoremap <Leader>gl :call GitMercurial("silent! Glog", "Hglog")<CR>
 
-" Use a spell file for storing dictionary exceptions
-set spellfile=~/.vim/spell/exceptions.utf-8.add
+"Redirector
+
 " Set up spell checking by default
-set spell spelllang=en_us
+"set spell spelllang=en_us
+" Use a spell file for storing dictionary exceptions
+"set spellfile=$HOME/.vim/spell/exceptions.utf-8.add
 
 " Use C-s to save the current file (only works if flow control is disabled)
 noremap <silent> <C-s>          :update<CR>
@@ -351,11 +371,20 @@ inoremap <silent> <C-s>         <C-O>:update<CR>
 " proper indentation for yaml files with home assistant
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
+""""""""""""""""""""""""""""""
+" riv.vim 
+""""""""""""""""""""""""""""""
+" riv currently has a bug where syntax-based spell checking does not
+" work correctly when an existing buffer is re-edited.  This workaround
+" forces complete spell checking always
+autocmd FileType rst syntax spell toplevel
+
 " format tabs as >--- when using :set list
 set listchars=tab:>-
 
 "vim-devicons should be loaded last
 if v:version > '702'
-    let g:webdevicons_enable = 0
     let g:webdevicons_conceal_nerdtree_brackets = 1
+    let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
+    let g:webdevicons_enable = 1
 endif
