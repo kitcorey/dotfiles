@@ -23,19 +23,24 @@ if v:version >= 700
     Plugin 'tmux-plugins/vim-tmux'
     Plugin 'xolox/vim-misc' " Required for vim-notes
     Plugin 'xolox/vim-notes'
+    Plugin 'AndrewRadev/linediff.vim'
     Plugin 'ludovicchabant/vim-lawrencium'
     Plugin 'tpope/vim-fugitive'
     Plugin 'derekwyatt/vim-scala'
     Plugin 'vim-scripts/vcscommand.vim'
     Plugin 'scrooloose/nerdtree'
+    Plugin 'godlygeek/tabular'
     "Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
     Plugin 'Xuyuanp/nerdtree-git-plugin'
     Plugin 'f4t-t0ny/nerdtree-hg-plugin'
-    Plugin 'mileszs/ack.vim'
+    "Plugin 'mileszs/ack.vim'
     Plugin 'Rykka/riv.vim'
     Plugin 'chazy/cscope_maps'
     Plugin 'tpope/vim-abolish'
     Plugin 'chrisbra/csv.vim'
+    Plugin 'andymass/vim-matchup'
+    Plugin 'elzr/vim-json'
+    Plugin 'vim-scripts/repmo.vim'
 endif
 
 "The following require vim version >= 7.2
@@ -143,13 +148,19 @@ autocmd FileType python map <buffer> <F8> :call Flake8()<CR>
 """"""""""""""""""""""""""""""
 " ack.vim
 """"""""""""""""""""""""""""""
-let g:ackprg = 'ag --nogroup --nocolor --column'
-nnoremap <space>/ :Ag<Space>
+"let g:ackprg = 'ag --nogroup --nocolor --column'
+let g:ackprg = 'rg --vimgrep --no-heading'
 
 """"""""""""""""""""""""""""""
 " fzf.vim
 """"""""""""""""""""""""""""""
+"let $FZF_DEFAULT_COMMAND = 'ag -l -g ""'
+let $FZF_DEFAULT_COMMAND = 'rg --files'
 nnoremap <c-p> :Files<cr>
+set grepprg=rg\ --vimgrep
+"command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>), 1, <bang>0)
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+nnoremap <space>/ :Find<Space>
 
 """"""""""""""""""""""""""""""
 " unite.vim
@@ -267,9 +278,9 @@ endif
 
 " Matchit is already installed in newer versions of vim.
 " Configure matchit so that it goes from opening tag to closing tag
-if v:version >= 700
-    runtime macros/matchit.vim
-endif
+"if v:version >= 700
+"    runtime macros/matchit.vim
+"endif
 
 "Turn off automatic indentation for perl and python files when using # 
 "for comments
