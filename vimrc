@@ -163,6 +163,15 @@ command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed
 nnoremap <space>/ :Find<Space>
 
 """"""""""""""""""""""""""""""
+" json.vim
+""""""""""""""""""""""""""""""
+map <leader>l :silent exec &conceallevel ? "set conceallevel=0" : "set conceallevel=2"<CR>
+" =j will use python to reformat json text
+" (Use python3 because python 3.5 has the desirable behavior of not re-ordering
+" keys alphabetically)
+nmap =j :%!python3 -m json.tool<CR>
+
+""""""""""""""""""""""""""""""
 " unite.vim
 """"""""""""""""""""""""""""""
 "search local directory recursively (handled by fzf)
