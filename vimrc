@@ -154,7 +154,6 @@ let g:ackprg = 'rg --vimgrep --no-heading'
 """"""""""""""""""""""""""""""
 " fzf.vim
 """"""""""""""""""""""""""""""
-"let $FZF_DEFAULT_COMMAND = 'ag -l -g ""'
 let $FZF_DEFAULT_COMMAND = 'rg --files'
 nnoremap <c-p> :Files<cr>
 set grepprg=rg\ --vimgrep

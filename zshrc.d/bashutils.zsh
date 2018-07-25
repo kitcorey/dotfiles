@@ -1,1 +1,1 @@
-path+=${HOME}/bashutils/bin
+path+=${HOME}/repos/bitbucket/bashutils/bin
