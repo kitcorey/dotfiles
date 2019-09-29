@@ -17,7 +17,8 @@ set shortmess=a
 
 "The following require vim version >= 7.0
 if v:version >= 700
-    Plugin 'altercation/vim-colors-solarized'
+    "Plugin 'altercation/vim-colors-solarized'
+    Plugin 'lifepillar/vim-solarized8'
     Plugin 'vim-scripts/sudo.vim'
     Plugin 'nvie/vim-flake8'
     Plugin 'tmux-plugins/vim-tmux'
@@ -279,9 +280,9 @@ syntax enable
 " solarized
 """"""""""""""""""""""""""""""
 if v:version >= 700
-    call togglebg#map("<Leader>bg")
+    let g:solarized_use16=1
     set background=dark
-    colorscheme solarized
+    colorscheme solarized8
 endif
 
 " Matchit is already installed in newer versions of vim.
