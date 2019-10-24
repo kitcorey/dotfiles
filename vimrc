@@ -398,6 +398,9 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 " work correctly when an existing buffer is re-edited.  This workaround
 " forces complete spell checking always
 autocmd FileType rst syntax spell toplevel
+if v:version >= 700
+  let g:riv_auto_format_table = 0
+endif
 
 " format tabs as >--- when using :set list
 set listchars=tab:>-
