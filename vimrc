@@ -42,6 +42,7 @@ if v:version >= 700
     Plugin 'andymass/vim-matchup'
     Plugin 'elzr/vim-json'
     Plugin 'vim-scripts/repmo.vim'
+    Plugin 'PProvost/vim-ps1'
 endif
 
 "The following require vim version >= 7.2
@@ -144,7 +145,6 @@ let g:zoomwin_localoptlist = []
 """"""""""""""""""""""""""""""
 " Remap the flake8 command to F8 (which really should have been the default!)
 autocmd FileType python map <buffer> <F8> :call Flake8()<CR>
-
 
 """"""""""""""""""""""""""""""
 " ack.vim
