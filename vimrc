@@ -18,7 +18,8 @@ set shortmess=a
 "The following require vim version >= 7.0
 if v:version >= 700
     "Plugin 'altercation/vim-colors-solarized'
-    Plugin 'lifepillar/vim-solarized8'
+    Plugin 'gruvbox-community/gruvbox'
+    "Plugin 'lifepillar/vim-solarized8'
     Plugin 'vim-scripts/sudo.vim'
     Plugin 'nvie/vim-flake8'
     Plugin 'tmux-plugins/vim-tmux'
@@ -252,7 +253,7 @@ set encoding=utf-8
 set laststatus=2
 set noruler		" Disable the builtin line/column ruler at the bottom of the file
 set noshowmode
-let g:airline_theme             = 'solarized'
+let g:airline_theme = 'gruvbox'
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -279,10 +280,19 @@ syntax enable
 """"""""""""""""""""""""""""""
 " solarized
 """"""""""""""""""""""""""""""
+"if v:version >= 700
+"    let g:solarized_use16=1
+"    set background=dark
+"    colorscheme solarized8
+"endif
+
+""""""""""""""""""""""""""""""
+" gruvbox
+""""""""""""""""""""""""""""""
 if v:version >= 700
-    let g:solarized_use16=1
+    let g:gruvbox_termcolors=16
     set background=dark
-    colorscheme solarized8
+    colorscheme gruvbox
 endif
 
 " Matchit is already installed in newer versions of vim.
