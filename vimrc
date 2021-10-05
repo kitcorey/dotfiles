@@ -20,6 +20,7 @@ if v:version >= 700
     "Plugin 'altercation/vim-colors-solarized'
     Plugin 'gruvbox-community/gruvbox'
     "Plugin 'lifepillar/vim-solarized8'
+    "Plugin 'lifepillar/vim-gruvbox8'
     Plugin 'vim-scripts/sudo.vim'
     Plugin 'nvie/vim-flake8'
     Plugin 'tmux-plugins/vim-tmux'
@@ -264,6 +265,16 @@ let g:airline#extensions#tabline#tab_min_count = 2
 let g:airline#extensions#branch#enabled = 1
 let g:airline_detect_spell=1
 
+if &term =~ '256color'
+  " Enable true (24-bit) colors instead of (8-bit) 256 colors.
+  " :h true-color
+  if has('termguicolors')
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+    set termguicolors
+  endif
+endif
+
 "fix delay when pressing escape with airline
 if ! has('gui_running')
   set ttimeoutlen=10
@@ -290,7 +301,7 @@ syntax enable
 " gruvbox
 """"""""""""""""""""""""""""""
 if v:version >= 700
-    let g:gruvbox_termcolors=16
+    "let g:gruvbox_termcolors=16
     set background=dark
     colorscheme gruvbox
 endif
