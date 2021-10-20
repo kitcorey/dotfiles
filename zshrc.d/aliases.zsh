@@ -3,4 +3,5 @@ myipv4() {
 }
 alias myip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
 alias whatismyip="curl ifconfig.co"
+alias vi=vim
 
