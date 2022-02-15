@@ -385,7 +385,7 @@ function! GitMercurial(git_name, hg_name)
 endfunction
 nnoremap <leader>gs :call GitMercurial("Gstatus", "Hgstatus")<CR>
 nnoremap <leader>gd :call GitMercurial("Gvdiff", "Hgvdiff")<CR>
-nnoremap <leader>gb :call GitMercurial("Gblame", "VCSBlame!")<CR>
+nnoremap <leader>gb :call GitMercurial("Git blame", "VCSBlame!")<CR>
 if !exists(":Greview")
     command Greview :Git! diff --staged
 endif
