@@ -45,6 +45,8 @@ if v:version >= 700
     Plugin 'elzr/vim-json'
     Plugin 'vim-scripts/repmo.vim'
     Plugin 'PProvost/vim-ps1'
+    Plugin 'tpope/vim-unimpaired'
+    Plugin 'ngemily/vim-vp4'
 endif
 
 "The following require vim version >= 7.2
@@ -164,6 +166,7 @@ set grepprg=rg\ --vimgrep
 "command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>), 1, <bang>0)
 command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
 nnoremap <space>/ :Find<Space>
+nnoremap <space>b :Buffer<CR>
 
 """"""""""""""""""""""""""""""
 " json.vim
