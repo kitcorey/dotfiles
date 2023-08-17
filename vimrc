@@ -47,6 +47,8 @@ if v:version >= 700
     Plugin 'PProvost/vim-ps1'
     Plugin 'tpope/vim-unimpaired'
     Plugin 'ngemily/vim-vp4'
+    Plugin 'tommcdo/vim-lion'
+    Plugin 'AndrewRadev/sideways.vim'
 endif
 
 "The following require vim version >= 7.2
@@ -305,7 +307,7 @@ syntax enable
 " gruvbox
 """"""""""""""""""""""""""""""
 if v:version >= 700
-    "let g:gruvbox_termcolors=16
+    let g:gruvbox_termcolors=16
     set background=dark
     colorscheme gruvbox
 endif
@@ -380,7 +382,7 @@ map <C-n> :NERDTreeToggle<CR>
 " Function to call a fugitive function if the current file is under a git
 " repository, and call the equivalent lawrencium command otherwise
 function! GitMercurial(git_name, hg_name)
-        if fugitive#head("show detached") == ""
+        if fugitive#Head("show detached") == ""
             execute a:hg_name
         else
             execute a:git_name
@@ -440,7 +442,7 @@ function! StatusLine(current, width)
   endif
   let l:s .= ' %f%h%w%m%r '
   if a:current
-    let l:s .= crystalline#right_sep('', 'Fill') . ' %{fugitive#head()}'
+    let l:s .= crystalline#right_sep('', 'Fill') . ' %{fugitive#Head()}'
   endif
 
   let l:s .= '%='
