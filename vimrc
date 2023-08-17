@@ -34,8 +34,8 @@ if v:version >= 700
     Plugin 'scrooloose/nerdtree'
     Plugin 'godlygeek/tabular'
     "Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
-    Plugin 'Xuyuanp/nerdtree-git-plugin'
-    Plugin 'f4t-t0ny/nerdtree-hg-plugin'
+    "Plugin 'Xuyuanp/nerdtree-git-plugin'
+    "Plugin 'f4t-t0ny/nerdtree-hg-plugin'
     "Plugin 'mileszs/ack.vim'
     Plugin 'Rykka/riv.vim'
     Plugin 'chazy/cscope_maps'
@@ -49,6 +49,7 @@ if v:version >= 700
     Plugin 'ngemily/vim-vp4'
     Plugin 'tommcdo/vim-lion'
     Plugin 'AndrewRadev/sideways.vim'
+    "Plugin 'vim-scripts/LargeFile'
 endif
 
 "The following require vim version >= 7.2
