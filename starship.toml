@@ -1,27 +1,6 @@
-[perl]
-disabled = true
-
-[python]
-disabled = true
-
-[username]
-show_always = true
-format='[$user]($style) '
-
-[c]
-disabled = true
-
-[hostname]
-ssh_symbol = ''
-format = 'on [$ssh_symbol$hostname]($style) '
-style='bold green'
-
-[time]
-disabled = false
-
-[cmd_duration]
-disabled = true
+[git_commit]
+tag_disabled = false
 
 [directory]
-truncation_length = 0
-format='in [$path]($style)[$read_only]($read_only_style) '
+truncation_length = 4
+truncate_to_repo = false

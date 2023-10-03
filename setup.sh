@@ -18,6 +18,14 @@ setup_vim() {
     cp $cp_options flake8 $HOME/.config/flake8
 }
 
+setup_starship() {
+    if [ $overwrite = true ] || [ $created = true ] ; then
+        #Install all vundle plugins
+        mkdir -p $HOME/.config
+        ln -s $(pwd)/starship.toml $HOME/.config/starship.toml
+    fi
+}
+
 setup_tmux() {
     declare plugins_destination=$HOME/.tmux/plugins/tpm
     declare tmux_conf=$HOME/.tmux.conf
@@ -63,9 +71,6 @@ setup_zsh() {
         mkdir -p ${zshrc_d}
         ln -s $(pwd)/zshrc.d/* ${zshrc_d}
         append_if_new zshrc $zshrc
-        # Install oh-my-zsh
-	    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-        curl https://raw.githubusercontent.com/oskarkrawczyk/honukai-iterm/master/honukai.zsh-theme -o $HOME/.oh-my-zsh/themes/honukai.zsh-theme
     fi
 }
 
@@ -122,6 +127,7 @@ done
 shift $((OPTIND-1))
 
 setup_vim
+setup_starship
 setup_tmux
 setup_git
 setup_bash

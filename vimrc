@@ -79,7 +79,7 @@ if v:version >= '704'
     Plugin 'junegunn/fzf.vim' "Depends on fzf
 endif
 
-if v:version >= '800'
+if v:version >= '900'
     Plugin 'rbong/vim-crystalline'
 endif
 
