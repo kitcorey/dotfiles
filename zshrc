@@ -12,10 +12,6 @@ antigen bundle git
 antigen bundle babasbot/auto-fortune-cowsay-zsh
 
 
-# workaround for https://github.com/zsh-users/antigen/issues/675
-THEME=denysdovhan/spaceship-prompt
-antigen list | grep $THEME; if [ $? -ne 0 ]; then antigen theme $THEME; fi
-
 antigen apply
 
 export SPACESHIP_TIME_SHOW=true
@@ -129,3 +125,6 @@ if [ -d $HOME/.shellrc/zshrc.d ]; then
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Starting the starship prompt should be done last
+eval "$(starship init zsh)"
