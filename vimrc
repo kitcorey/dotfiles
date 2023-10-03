@@ -5,6 +5,10 @@ set nocompatible
 "Disable filetype for now, as required by vundle, it will be re-enabled later
 filetype off
 
+"encoding sets how vim shall represent characters internally. Utf-8 is
+"necessary for most flavors of Unicode
+set encoding=utf-8
+
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -254,24 +258,6 @@ nnoremap <C-W>m :tab split<CR>
 " Show line numbers with a in normal mode
 noremap a :set invnumber<cr>"
 
-""""""""""""""""""""""""""""""
-" airline
-""""""""""""""""""""""""""""""
-set encoding=utf-8
-set laststatus=2
-set noruler		" Disable the builtin line/column ruler at the bottom of the file
-set noshowmode
-let g:airline_theme = 'gruvbox'
-let g:airline#extensions#whitespace#enabled = 0
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#show_buffers = 0
-let g:airline#extensions#tabline#fnamemod = ':t'
-let g:airline#extensions#tabline#tab_nr_type = 1
-let g:airline#extensions#tabline#tab_min_count = 2
-let g:airline#extensions#branch#enabled = 1
-let g:airline_detect_spell=1
-
 if &term =~ '256color'
   " Enable true (24-bit) colors instead of (8-bit) 256 colors.
   " :h true-color
@@ -433,25 +419,32 @@ endif
 " format tabs as >--- when using :set list
 set listchars=tab:>-
 
-function! StatusLine(current, width)
+""""""""""""""""""""""""""""""
+" crystalline
+""""""""""""""""""""""""""""""
+set laststatus=2 " Always show status line
+set noruler		 " Disable the builtin line/column ruler at the bottom of the filek
+set noshowmode   " The crystalline status line will show the mode
+function! g:CrystallineStatuslineFn(winnr)
   let l:s = ''
+  let l:curr = a:winnr == winnr()
 
-  if a:current
-    let l:s .= crystalline#mode() . crystalline#right_mode_sep('')
+  if l:curr
+    let l:s .= crystalline#ModeSection(0, 'A', 'B')
   else
-    let l:s .= '%#CrystallineInactive#'
+    let l:s .= crystalline#HiItem('Fill')
   endif
   let l:s .= ' %f%h%w%m%r '
-  if a:current
-    let l:s .= crystalline#right_sep('', 'Fill') . ' %{fugitive#Head()}'
+  if l:curr
+    let l:s .= crystalline#Sep(0, 'B', 'Fill') . ' %{fugitive#Head()}'
   endif
 
   let l:s .= '%='
-  if a:current
-    let l:s .= crystalline#left_sep('', 'Fill') . ' %{&paste ?"PASTE ":""}%{&spell?"SPELL ":""}'
-    let l:s .= crystalline#left_mode_sep('')
+  if l:curr
+    let l:s .= crystalline#Sep(1, 'Fill', 'B') . '%{&paste ? " PASTE " : " "}'
+    let l:s .= crystalline#Sep(1, 'B', 'A')
   endif
-  if a:width > 80
+  if winwidth(a:winnr) > 80
     let l:s .= ' %{&ft}[%{&fenc!=#""?&fenc:&enc}][%{&ff}] %l/%L %c%V %P '
   else
     let l:s .= ' '
@@ -460,14 +453,12 @@ function! StatusLine(current, width)
   return l:s
 endfunction
 
-function! TabLine()
+function! g:CrystallineTablineFn()
   let l:vimlabel = has('nvim') ?  ' NVIM ' : ' VIM '
   return crystalline#bufferline(2, len(l:vimlabel), 1) . '%=%#CrystallineTab# ' . l:vimlabel
 endfunction
 
 let g:crystalline_enable_sep = 1
-let g:crystalline_statusline_fn = 'StatusLine'
-let g:crystalline_tabline_fn = 'TabLine'
 let g:crystalline_theme = 'gruvbox'
 
 "vim-devicons should be loaded last
