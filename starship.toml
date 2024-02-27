@@ -4,3 +4,6 @@ tag_disabled = false
 [directory]
 truncation_length = 4
 truncate_to_repo = false
+
+[ruby]
+detect_variables = []
