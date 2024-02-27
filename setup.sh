@@ -25,6 +25,13 @@ setup_vim() {
     fi
 }
 
+setup_pyenv() {
+    destination=$HOME/.pyenv
+    if [ ! -d "$destination" ] ; then
+        git clone https://github.com/pyenv/pyenv.git $destination
+    fi
+}
+
 setup_starship() {
     if [ $overwrite = true ] || [ $created = true ] ; then
         #Install all vundle plugins
@@ -87,8 +94,11 @@ setup_repos() {
 }
 
 setup_fzf() {
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    cd ~/.fzf && git pull && ./install --bin && cd -
+    destination=$HOME/.fzf
+    if [ ! -d "$destination" ] ; then
+        git clone --depth 1 https://github.com/junegunn/fzf.git "${destination}"
+        cd "${destination}" && git pull && ./install --bin && cd -
+    fi
 }
 
 append_with_newline() {
@@ -143,3 +153,4 @@ setup_csh
 setup_zsh
 setup_repos
 setup_fzf
+setup_pyenv
