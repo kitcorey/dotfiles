@@ -34,7 +34,7 @@ setup_pyenv() {
 
 setup_starship() {
     if [ $overwrite = true ] || [ $created = true ] ; then
-        #Install all vundle plugins
+        curl -sS https://starship.rs/install.sh | sh
         mkdir -p $HOME/.config
         ln -s $(pwd)/starship.toml $HOME/.config/starship.toml
     fi
