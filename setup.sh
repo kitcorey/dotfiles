@@ -104,6 +104,13 @@ setup_fzf() {
     fi
 }
 
+setup_zoxide() {
+    if ! command -v zoxide &> /dev/null
+    then
+        curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+    fi
+}
+
 append_with_newline() {
     # Append file $1 to file $2 with a newline in between
     if [ $# -ne 2 ]; then
@@ -128,6 +135,33 @@ append_if_new() {
         return 0
     else
         return 1
+    fi
+}
+
+setup_alacritty() {
+    setup_rust
+    if ! command -v alacritty &> /dev/null
+    then
+        cargo install alacritty
+    fi
+}
+
+setup_ripgrep() {
+    setup_rust
+    if ! command -v rg &> /dev/null
+    then
+        cargo install ripgrep
+    fi
+}
+
+setup_rust() {
+    if ! command -v cargo &> /dev/null
+    then
+        echo "cargo could not be found, installing rust."
+        # Install cargo
+        curl https://sh.rustup.rs -sSf | sh
+        # Install cargo binstall
+        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     fi
 }
 
@@ -157,3 +191,6 @@ setup_zsh
 setup_repos
 setup_fzf
 setup_pyenv
+#setup_alacritty
+setup_ripgrep
+setup_zoxide
