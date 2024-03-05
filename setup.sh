@@ -32,6 +32,7 @@ setup_pyenv() {
     destination=$HOME/.pyenv
     if [ ! -d "$destination" ] ; then
         git clone https://github.com/pyenv/pyenv.git $destination
+        git clone https://github.com/pyenv/pyenv-virtualenv.git $destination/plugins/pyenv-virtualenv
     fi
 }
 
@@ -105,8 +106,7 @@ setup_fzf() {
 }
 
 setup_zoxide() {
-    if ! command -v zoxide &> /dev/null
-    then
+    if ! command -v zoxide &> /dev/null; then
         curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     fi
 }
@@ -138,25 +138,29 @@ append_if_new() {
     fi
 }
 
+setup_rvm() {
+    if ! command -v rvm &> /dev/null; then
+        gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+        curl -sSL https://get.rvm.io | bash
+    fi
+}
+
 setup_alacritty() {
     setup_rust
-    if ! command -v alacritty &> /dev/null
-    then
+    if ! command -v alacritty &> /dev/null; then
         cargo install alacritty
     fi
 }
 
 setup_ripgrep() {
     setup_rust
-    if ! command -v rg &> /dev/null
-    then
+    if ! command -v rg &> /dev/null; then
         cargo install ripgrep
     fi
 }
 
 setup_rust() {
-    if ! command -v cargo &> /dev/null
-    then
+    if ! command -v cargo &> /dev/null; then
         echo "cargo could not be found, installing rust."
         # Install cargo
         curl https://sh.rustup.rs -sSf | sh
@@ -194,3 +198,5 @@ setup_pyenv
 #setup_alacritty
 setup_ripgrep
 setup_zoxide
+#do RVM last as it prefers that it's changes to PATH in ~/.bashrc are last
+setup_rvm
