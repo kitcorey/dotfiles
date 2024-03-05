@@ -103,7 +103,7 @@ setup_fzf() {
     destination=$HOME/.fzf
     if [ ! -d "$destination" ] ; then
         git clone --depth 1 https://github.com/junegunn/fzf.git "${destination}"
-        cd "${destination}" && git pull && ./install --bin && cd -
+        cd "${destination}" && git pull && ./install --key-bindings --completion --no-update-rc && cd -
     fi
 }
 
