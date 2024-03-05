@@ -13,6 +13,9 @@ setup_vim() {
         ln -s $(pwd)/vimrc $HOME/.vimrc
         vim +PlugInstall +qall
     fi
+    if [ $overwrite = true ] || [ ! -d "$HOME/.vim/after" ] ; then
+        cp $cp_options -r vim/after $HOME/.vim/after
+    fi
 
     mkdir -p $HOME/.config
     cp $cp_options flake8 $HOME/.config/flake8
