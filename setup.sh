@@ -39,7 +39,7 @@ setup_pyenv() {
 }
 
 setup_starship() {
-    if [ $overwrite = true ] || [ $created = true ] ; then
+    if ! command -v starship &> /dev/null; then
         curl -sS https://starship.rs/install.sh | sh
         mkdir -p $HOME/.config
         ln -s $(pwd)/starship.toml $HOME/.config/starship.toml
