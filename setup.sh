@@ -32,6 +32,8 @@ setup_pyenv() {
     destination=$HOME/.pyenv
     if [ ! -d "$destination" ] ; then
         git clone https://github.com/pyenv/pyenv.git $destination
+    fi
+    if [ ! -d "$destination/plugins/pyenv-virtualenv" ] ; then
         git clone https://github.com/pyenv/pyenv-virtualenv.git $destination/plugins/pyenv-virtualenv
     fi
 }
