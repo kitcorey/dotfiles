@@ -149,7 +149,6 @@ let g:unite_source_history_yank_enable = 1
 "search yanked text
 nnoremap <space>y :Unite -silent history/yank<cr>
 "search opened buffers
-"nnoremap <space>s :Unite -quick-match -silent buffer<cr>
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
