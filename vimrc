@@ -6,39 +6,34 @@ set nocompatible
 "necessary for most flavors of Unicode
 set encoding=utf-8
 
-call plug#begin()
+"Loaded by lazy.vim via plugins/vim.lua in neovim
+if !has('nvim')
+  call plug#begin()
+  
+  "The following require vim version >= 7.0
+  if v:version >= 700
+      Plug 'nvie/vim-flake8'
+      Plug 'xolox/vim-misc' " Required for vim-notes
+      Plug 'xolox/vim-notes'
+      Plug 'AndrewRadev/linediff.vim'
+      Plug 'ludovicchabant/vim-lawrencium'
+      Plug 'tpope/vim-fugitive'
+      Plug 'godlygeek/tabular'
+      Plug 'chazy/cscope_maps'
+      Plug 'tpope/vim-abolish'
+      Plug 'chrisbra/csv.vim'
+      Plug 'andymass/vim-matchup'
+      Plug 'elzr/vim-json'
+      Plug 'vim-scripts/repmo.vim'
+      Plug 'PProvost/vim-ps1'
+      Plug 'tpope/vim-unimpaired'
+      Plug 'tommcdo/vim-lion'
+      Plug 'AndrewRadev/sideways.vim'
+  endif
 
-"The following require vim version >= 7.0
-if v:version >= 700
-    Plug 'nvie/vim-flake8'
-    Plug 'xolox/vim-misc' " Required for vim-notes
-    Plug 'xolox/vim-notes'
-    Plug 'AndrewRadev/linediff.vim'
-    Plug 'ludovicchabant/vim-lawrencium'
-    Plug 'tpope/vim-fugitive'
-    Plug 'godlygeek/tabular'
-    Plug 'chazy/cscope_maps'
-    Plug 'tpope/vim-abolish'
-    Plug 'chrisbra/csv.vim'
-    Plug 'andymass/vim-matchup'
-    Plug 'elzr/vim-json'
-    Plug 'vim-scripts/repmo.vim'
-    Plug 'PProvost/vim-ps1'
-    Plug 'tpope/vim-unimpaired'
-    Plug 'tommcdo/vim-lion'
-    Plug 'AndrewRadev/sideways.vim'
-endif
-
-"The following require vim version >= 7.2
-if v:version >= '702'
-    " This plugin will still need to be compiled manually
-    Plug 'Shougo/vimproc.vim'
-    Plug 'Shougo/unite.vim'
-    Plug 'Shougo/neoyank.vim'
-endif
-
-" All of your Plugs must be added before the following line
-call plug#end()
+  " All of your Plugs must be added before the following line
+  call plug#end()
+end
 
 "Shorten the length of messages to help avoid 'press Enter' messages
 set shortmess=a
@@ -66,6 +61,7 @@ if has("mouse_sgr")
 elseif !has('nvim')
     set ttymouse=xterm2
 end
+
 " Keep three lines between the cursor and the edge of the screen
 set scrolloff=3
 " Move between displayed lines instead of physical lines
@@ -165,15 +161,28 @@ endif " has("autocmd")
 " Turn off backup files so they don't clutter the file system, since
 " persistent undo should be sufficient. Another option would be to use the
 " backupdir option to consolidate backup files in a single directory.
-if has('persistent_undo')
-    if !isdirectory($HOME."/.vim/undo")
-        call mkdir($HOME."/.vim/undo", "p")
+if !has('nvim')
+    if has('persistent_undo')
+        if !isdirectory($HOME."/.vim/undo")
+            call mkdir($HOME."/.vim/undo", "p")
+        endif
+        set undodir=~/.vim/undo//
+        set undofile
+        set undolevels=1000 "maximum number of changes that can be undone
+        set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+	set nobackup
     endif
-    set undodir=~/.vim/undo//
-    set undofile
-    set undolevels=1000 "maximum number of changes that can be undone
-    set undoreload=10000 "maximum number lines to save for undo on a buffer reload
-    set nobackup
+else
+    if has('persistent_undo')
+        if !isdirectory($HOME."/.nvim/undo")
+            call mkdir($HOME."/.nvim/undo", "p")
+        endif
+        set undodir=~/.nvim/undo//
+        set undofile
+        set undolevels=1000 "maximum number of changes that can be undone
+        set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+	set nobackup
+    endif
 endif
 
 """"""""""""""""""""""""""""""
@@ -295,3 +304,12 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 " format tabs as >--- when using :set list
 set listchars=tab:>-
+
+" This is required for windows terminal and WSL for.. reasons
+" https://github.com/vim/vim/issues/6365
+if has("unix")
+  let lines = readfile("/proc/version")
+  if lines[0] =~ "Microsoft"
+	set t_u7=
+  endif
+endif
