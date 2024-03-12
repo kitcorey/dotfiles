@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
+declare BASHRC_D="$HOME/.shellrc/bashrc.d"
 
 setup_vim() {
     destination=$HOME/.vim/autoload/plug.vim
@@ -72,15 +73,20 @@ setup_git() {
         touch $gitconfig
         append_if_new gitconfig $gitconfig
     fi
+
+    declare git_bash_completions="/usr/share/bash-completion/completions/git"
+    declare git_bash_target="${BASHRC_D}"/git.bash
+    if [ ! -e "${git_bash_target}" ] ; then
+        ln -s "${git_bash_completions}" "${git_bash_target}"
+    fi
 }
 
 setup_bash() {
     cp $cp_options inputrc $HOME/.inputrc
     declare bashrc="$HOME/.bashrc"
-    declare bashrc_d="$HOME/.shellrc/bashrc.d"
     if [ ! -e $bashrc ] || [ $overwrite = true ] ; then
-        mkdir -p ${bashrc_d}
-        ln -s $(pwd)/bashrc.d/* ${bashrc_d}
+        mkdir -p ${BASHRC_D}
+        ln -s $(pwd)/bashrc.d/* ${BASHRC_D}
         append_if_new bashrc $bashrc
     fi
 }
