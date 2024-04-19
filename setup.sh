@@ -47,10 +47,11 @@ setup_git() {
         touch $gitignore
         append_if_new gitignore $gitignore
     fi
-    git config --global core.excludesfile $gitignore
-    git config --global user.email kitcorey@users.noreply.github.com
-    git config --global user.name "Kit Corey"
-    git config --global  alias.lg 'log --graph --oneline --decorate --all'
+    gitconfig=$HOME/.gitconfig
+    if [ ! -e $gitconfig ] || [ $overwrite = true ] ; then
+        touch $gitconfig
+        append_if_new gitconfig $gitconfig
+    fi
 }
 
 setup_bash() {

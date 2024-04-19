@@ -1,0 +1,19 @@
+[core]
+	excludesfile = /home/kit/.gitignore
+	editor = vim
+[user]
+	email = kitcorey@users.noreply.github.com
+	name = Kit Corey
+[alias]
+	lg = log --graph --oneline --decorate --all
+
+[diff]
+	tool = difftastic
+[difftool]
+	prompt = false
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+[pager]
+	difftool = true
+[alias]
+	dft = difftool
