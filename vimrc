@@ -18,7 +18,6 @@ if v:version >= 700
     Plug 'tpope/vim-fugitive'
     Plug 'derekwyatt/vim-scala'
     Plug 'vim-scripts/vcscommand.vim'
-    Plug 'scrooloose/nerdtree'
     Plug 'godlygeek/tabular'
     Plug 'Rykka/riv.vim'
     Plug 'chazy/cscope_maps'
@@ -37,7 +36,6 @@ endif
 if v:version >= '702'
     " This plugin will still need to be compiled manually
     Plug 'Shougo/vimproc.vim'
-    Plug 'ryanoasis/vim-devicons'
     Plug 'Shougo/unite.vim'
     Plug 'Shougo/neoyank.vim'
 endif
@@ -49,8 +47,6 @@ call plug#end()
 set shortmess=a
 
 filetype plugin indent on    " required
-
-let g:webdevicons_enable = 0
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -274,33 +270,6 @@ set wildmode=longest,list:longest
 " Use the quickfix window instead
 let g:rtagsUseLocationList = 0
 
-""""""""""""""""""""""""""""""
-" NERDTree
-""""""""""""""""""""""""""""""
-let g:NERDTreeWinPos = "left"
-let g:NERDTreeHighlightCursorline = 2
-let g:NERDTreeChDirMode = 2 " NERDTree will change vim's CWD
-let g:NERDTreeMouseMode = 2 " Single click opens directories
-let g:NERDTreeIgnore = ['\.orig$', '\.pyc$']
-"let g:NERDTreeQuitOnOpen = 1 " Close NERDTree after opening a file
-let g:NERDTreeWinSize = 40 " Starting NERDTree size big enough for most filenames
-let g:NERDTreeIndicatorMap = {
-                \ 'Modified'  : '✗',
-                \ 'Staged'    : '✚',
-                \ 'Untracked' : '✭',
-                \ 'Renamed'   : '➜',
-                \ 'Unmerged'  : '═',
-                \ 'Deleted'   : '✖',
-                \ 'Dirty'     : '✗',
-                \ 'Clean'     : '✔︎',
-                \ 'Unknown'   : '?'
-                \ }
-" Open NerdTree if vim is started without any files
-" autocmd StdinReadPre * let s:std_in=1
-" autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-" Toggle NERDTree with C-n
-map <C-n> :NERDTreeToggle<CR>
-
 
 """"""""""""""""""""""""""""""
 " fugitive/lawrencium
@@ -357,10 +326,3 @@ endif
 
 " format tabs as >--- when using :set list
 set listchars=tab:>-
-
-"vim-devicons should be loaded last
-if v:version > '702'
-    let g:webdevicons_conceal_nerdtree_brackets = 1
-    let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
-    let g:webdevicons_enable = 1
-endif
