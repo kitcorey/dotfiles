@@ -19,7 +19,6 @@ if v:version >= 700
     Plug 'derekwyatt/vim-scala'
     Plug 'vim-scripts/vcscommand.vim'
     Plug 'godlygeek/tabular'
-    Plug 'Rykka/riv.vim'
     Plug 'chazy/cscope_maps'
     Plug 'tpope/vim-abolish'
     Plug 'chrisbra/csv.vim'
@@ -302,17 +301,6 @@ inoremap <silent> <C-s>         <C-O>:update<CR>
 
 " proper indentation for yaml files with home assistant
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
-
-""""""""""""""""""""""""""""""
-" riv.vim 
-""""""""""""""""""""""""""""""
-" riv currently has a bug where syntax-based spell checking does not
-" work correctly when an existing buffer is re-edited.  This workaround
-" forces complete spell checking always
-autocmd FileType rst syntax spell toplevel
-if v:version >= 700
-  let g:riv_auto_format_table = 0
-endif
 
 " format tabs as >--- when using :set list
 set listchars=tab:>-
