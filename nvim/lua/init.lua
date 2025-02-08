@@ -1,5 +1,9 @@
 require("config.lazy")
 
+-- If supported, neovim will change the cursor to a vertical bar in all insert
+-- modes.  This is hard to see in iterm2 with smaller fonts, so disable it
+vim.opt.guicursor = ""
+
 local toggle_lsp_client = function()
   local buf = vim.api.nvim_get_current_buf()
   local clients = vim.lsp.get_active_clients({ bufnr = buf })
