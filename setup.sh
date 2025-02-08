@@ -16,6 +16,12 @@ setup_vim() {
 
     mkdir -p $HOME/.config
     cp $cp_options flake8 $HOME/.config/flake8
+
+    if [ $overwrite = true ] || [ ! -d "$HOME/.config/nvim" ] ; then
+        mkdir -p $HOME/.config/nvim
+        ln -s $(pwd)/nvim/init.vim $HOME/.config/nvim/init.vim
+        ln -s $(pwd)/nvim/lua $HOME/.config/nvim/lua
+    fi
 }
 
 setup_starship() {
