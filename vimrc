@@ -16,8 +16,6 @@ if v:version >= 700
     Plug 'AndrewRadev/linediff.vim'
     Plug 'ludovicchabant/vim-lawrencium'
     Plug 'tpope/vim-fugitive'
-    Plug 'derekwyatt/vim-scala'
-    Plug 'vim-scripts/vcscommand.vim'
     Plug 'godlygeek/tabular'
     Plug 'chazy/cscope_maps'
     Plug 'tpope/vim-abolish'
