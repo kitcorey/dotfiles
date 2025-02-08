@@ -11,7 +11,7 @@ setup_vim() {
     if [ $overwrite = true ] || [ $created = true ] ; then
         #Install all vundle plugins
         ln -s $(pwd)/vimrc $HOME/.vimrc
-        vim +PluginInstall +qall
+        vim +PlugInstall +qall
     fi
 
     mkdir -p $HOME/.config
