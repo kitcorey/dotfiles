@@ -1,6 +1,6 @@
 [core]
 	excludesfile = /home/kit/.gitignore
-	editor = vim
+	editor = nvim
 [user]
 	email = kitcorey@users.noreply.github.com
 	name = Kit Corey
