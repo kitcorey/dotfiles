@@ -22,7 +22,7 @@ set shortmess=a
 "The following require vim version >= 7.0
 if v:version >= 700
     "Plugin 'altercation/vim-colors-solarized'
-    Plugin 'gruvbox-community/gruvbox'
+    "Plugin 'gruvbox-community/gruvbox'
     "Plugin 'lifepillar/vim-solarized8'
     "Plugin 'lifepillar/vim-gruvbox8'
     Plugin 'vim-scripts/sudo.vim'
@@ -50,7 +50,7 @@ if v:version >= 700
     Plugin 'vim-scripts/repmo.vim'
     Plugin 'PProvost/vim-ps1'
     Plugin 'tpope/vim-unimpaired'
-    Plugin 'ngemily/vim-vp4'
+    "Plugin 'ngemily/vim-vp4'
     Plugin 'tommcdo/vim-lion'
     Plugin 'AndrewRadev/sideways.vim'
     "Plugin 'vim-scripts/LargeFile'
@@ -74,10 +74,10 @@ if v:version >= '703'
 endif
 
 "The following require vim version >= 7.4
-if v:version >= '704'
-    Plugin 'junegunn/fzf'
-    Plugin 'junegunn/fzf.vim' "Depends on fzf
-endif
+"if v:version >= '704'
+"    Plugin 'junegunn/fzf'
+"    Plugin 'junegunn/fzf.vim' "Depends on fzf
+"endif
 
 if v:version >= '900'
     Plugin 'rbong/vim-crystalline'
@@ -107,7 +107,7 @@ set mouse=n
 " Force vim to use advanced mouse features from the future (dragging)
 if has("mouse_sgr")
     set ttymouse=sgr
-else
+elseif !has('nvim')
     set ttymouse=xterm2
 end
 " Keep three lines between the cursor and the edge of the screen
@@ -168,12 +168,12 @@ let g:ackprg = 'rg --vimgrep --no-heading'
 " fzf.vim
 """"""""""""""""""""""""""""""
 let $FZF_DEFAULT_COMMAND = 'rg --files'
-nnoremap <c-p> :Files<cr>
+"nnoremap <c-p> :Files<cr>
 set grepprg=rg\ --vimgrep
 "command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>), 1, <bang>0)
-command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
-nnoremap <space>/ :Find<Space>
-nnoremap <space>b :Buffer<CR>
+"command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+"nnoremap <space>/ :Find<Space>
+"nnoremap <space>b :Buffer<CR>
 
 """"""""""""""""""""""""""""""
 " json.vim
@@ -199,7 +199,7 @@ let g:unite_source_history_yank_enable = 1
 "search yanked text
 nnoremap <space>y :Unite -silent history/yank<cr>
 "search opened buffers
-nnoremap <space>s :Unite -quick-match -silent buffer<cr>
+"nnoremap <space>s :Unite -quick-match -silent buffer<cr>
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -293,11 +293,11 @@ syntax enable
 """"""""""""""""""""""""""""""
 " gruvbox
 """"""""""""""""""""""""""""""
-if v:version >= 700
-    let g:gruvbox_termcolors=16
-    set background=dark
-    colorscheme gruvbox
-endif
+"if v:version >= 700
+"    let g:gruvbox_termcolors=16
+"    set background=dark
+"    colorscheme gruvbox
+"endif
 
 " Matchit is already installed in newer versions of vim.
 " Configure matchit so that it goes from opening tag to closing tag
@@ -425,16 +425,30 @@ set listchars=tab:>-
 set laststatus=2 " Always show status line
 set noruler		 " Disable the builtin line/column ruler at the bottom of the filek
 set noshowmode   " The crystalline status line will show the mode
+
+
+function! g:GroupSuffix()
+  if mode() ==# 'i' && &paste
+    return '2'
+  endif
+  if &modified
+    return '1'
+  endif
+  return ''
+endfunction
+
 function! g:CrystallineStatuslineFn(winnr)
-  let l:s = ''
+  let g:crystalline_group_suffix = g:GroupSuffix()
   let l:curr = a:winnr == winnr()
+  let l:s = ''
 
   if l:curr
     let l:s .= crystalline#ModeSection(0, 'A', 'B')
   else
-    let l:s .= crystalline#HiItem('Fill')
+    let l:s .= crystalline#HiItem('InactiveFill')
   endif
   let l:s .= ' %f%h%w%m%r '
+  let l:s .= '%<'
   if l:curr
     let l:s .= crystalline#Sep(0, 'B', 'Fill') . ' %{fugitive#Head()}'
   endif
@@ -445,7 +459,7 @@ function! g:CrystallineStatuslineFn(winnr)
     let l:s .= crystalline#Sep(1, 'B', 'A')
   endif
   if winwidth(a:winnr) > 80
-    let l:s .= ' %{&ft}[%{&fenc!=#""?&fenc:&enc}][%{&ff}] %l/%L %c%V %P '
+    let l:s .= ' %{&ft} %l/%L %2v '
   else
     let l:s .= ' '
   endif
