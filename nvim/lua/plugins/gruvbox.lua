@@ -6,5 +6,11 @@ return {
             vim.o.background = "dark" -- or "light" for light mode
             vim.cmd([[colorscheme gruvbox]])
         end
+    },
+    {
+        "nvim-lualine/lualine.nvim",
+        options = {
+            theme = "gruvbox"
+        }
     }
 }

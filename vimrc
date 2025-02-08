@@ -358,62 +358,6 @@ endif
 " format tabs as >--- when using :set list
 set listchars=tab:>-
 
-""""""""""""""""""""""""""""""
-" crystalline
-""""""""""""""""""""""""""""""
-set laststatus=2 " Always show status line
-set noruler		 " Disable the builtin line/column ruler at the bottom of the filek
-set noshowmode   " The crystalline status line will show the mode
-
-
-function! g:GroupSuffix()
-  if mode() ==# 'i' && &paste
-    return '2'
-  endif
-  if &modified
-    return '1'
-  endif
-  return ''
-endfunction
-
-function! g:CrystallineStatuslineFn(winnr)
-  let g:crystalline_group_suffix = g:GroupSuffix()
-  let l:curr = a:winnr == winnr()
-  let l:s = ''
-
-  if l:curr
-    let l:s .= crystalline#ModeSection(0, 'A', 'B')
-  else
-    let l:s .= crystalline#HiItem('InactiveFill')
-  endif
-  let l:s .= ' %f%h%w%m%r '
-  let l:s .= '%<'
-  if l:curr
-    let l:s .= crystalline#Sep(0, 'B', 'Fill') . ' %{fugitive#Head()}'
-  endif
-
-  let l:s .= '%='
-  if l:curr
-    let l:s .= crystalline#Sep(1, 'Fill', 'B') . '%{&paste ? " PASTE " : " "}'
-    let l:s .= crystalline#Sep(1, 'B', 'A')
-  endif
-  if winwidth(a:winnr) > 80
-    let l:s .= ' %{&ft} %l/%L %2v '
-  else
-    let l:s .= ' '
-  endif
-
-  return l:s
-endfunction
-
-function! g:CrystallineTablineFn()
-  let l:vimlabel = has('nvim') ?  ' NVIM ' : ' VIM '
-  return crystalline#bufferline(2, len(l:vimlabel), 1) . '%=%#CrystallineTab# ' . l:vimlabel
-endfunction
-
-let g:crystalline_enable_sep = 1
-let g:crystalline_theme = 'gruvbox'
-
 "vim-devicons should be loaded last
 if v:version > '702'
     let g:webdevicons_conceal_nerdtree_brackets = 1
