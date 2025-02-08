@@ -1,4 +1,4 @@
-require('plugins')
+require("config.lazy")
 
 local toggle_lsp_client = function()
   local buf = vim.api.nvim_get_current_buf()
@@ -9,33 +9,7 @@ local toggle_lsp_client = function()
     vim.cmd("LspStart")
   end
 end
-vim.keymap.set('n', '<leader>lt', toggle_lsp_client)
 
-local lspconfig = require('lspconfig')
-
--- Notably _not_ including `compile_commands.json`, as we want the entire project
-local root_pattern = lspconfig.util.root_pattern('.git')
-
--- Might be cleaner to try to expose this as a pattern from `lspconfig.util`, as
--- really it is just stolen from part of the `clangd` config
-local function project_name_to_container_name()
-    -- Turn the name of the current file into the name of an expected container, assuming that
-    -- the container running/building this file is named the same as the basename of the project
-    -- that the file is in
-    --
-    -- The name of the current buffer
-    local bufname = vim.api.nvim_buf_get_name(0)
-
-    -- Turned into a filename
-    local filename = lspconfig.util.path.is_absolute(bufname) and bufname or lspconfig.util.path.join(vim.loop.cwd(), bufname)
-
-    -- Then the directory of the project
-    local project_dirname = root_pattern(filename) or lspconfig.util.path.dirname(filename)
-
-    -- And finally perform what is essentially a `basename` on this directory
-    print(vim.fn.fnamemodify(lspconfig.util.find_git_ancestor(project_dirname), ':t'))
-    return vim.fn.fnamemodify(lspconfig.util.find_git_ancestor(project_dirname), ':t')
-end
 vim.keymap.set('n', '<leader>lp', toggle_lsp_client)
 
 -- Global mappings.
@@ -76,22 +50,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-require'nvim-treesitter.configs'.setup {
-  highlight = {
-    enable = true,
-    disable = { "lua" },
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-    ensure_installed = { "python", "ruby", "yaml" }
-  },
-}
-
 -- vim.lsp.set_log_level("debug")
 
--- vim.keymap.set('n', '<leader>tld', toggle-lsp-diag)
+-- Toggle diagnostics for all buffers.  Taken from:
+-- https://github.com/WhoIsSethDaniel/toggle-lsp-diagnostics.nvim
+vim.keymap.set('n', '<leader>td', function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { silent = true, noremap = true })
 
 -- Show source of diagnostics
 vim.diagnostic.config({

@@ -21,6 +21,7 @@ setup_vim() {
         mkdir -p $HOME/.config/nvim
         ln -s $(pwd)/nvim/init.vim $HOME/.config/nvim/init.vim
         ln -s $(pwd)/nvim/lua $HOME/.config/nvim/lua
+        ln -s $(pwd)/nvim/plugins $HOME/.config/nvim/plugins
     fi
 }
 
