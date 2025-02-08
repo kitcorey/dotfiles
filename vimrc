@@ -123,15 +123,9 @@ autocmd FileType python map <buffer> <F8> :call Flake8()<CR>
 let g:ackprg = 'rg --vimgrep --no-heading'
 
 """"""""""""""""""""""""""""""
-" fzf.vim
+" grep
 """"""""""""""""""""""""""""""
-let $FZF_DEFAULT_COMMAND = 'rg --files'
-"nnoremap <c-p> :Files<cr>
 set grepprg=rg\ --vimgrep
-"command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>), 1, <bang>0)
-"command! -bang -nargs=* Find call fzf#vim#grep('rg --column --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
-"nnoremap <space>/ :Find<Space>
-"nnoremap <space>b :Buffer<CR>
 
 """"""""""""""""""""""""""""""
 " json.vim
