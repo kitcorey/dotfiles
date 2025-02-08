@@ -172,6 +172,9 @@ if has("autocmd")
 endif " has("autocmd")
 
 " persistent undo
+" Turn off backup files so they don't clutter the file system, since
+" persistent undo should be sufficient. Another option would be to use the
+" backupdir option to consolidate backup files in a single directory.
 if has('persistent_undo')
     if !isdirectory($HOME."/.vim/undo")
         call mkdir($HOME."/.vim/undo", "p")
@@ -180,19 +183,6 @@ if has('persistent_undo')
     set undofile
     set undolevels=1000 "maximum number of changes that can be undone
     set undoreload=10000 "maximum number lines to save for undo on a buffer reload
-endif
-
-" Turn off backup files so they don't clutter the file system, since
-" persistent undo should be sufficient. Another option would be to use the
-" backupdir option to consolidate backup files in a single directory.
-" Unfortunately there is an outstanding bug with that option that hasn't been
-" patched.  As of 2017-03-08 the backupdir option does not support trailing
-" double slashes to guarantee that each file is unique.
-"if !isdirectory($HOME."/.vim/backup")
-"    call mkdir($HOME."/.vim/backup", "p")
-"endif
-"set backupdir=~/.vim/backup//
-if has('persistent_undo')
     set nobackup
 endif
 
