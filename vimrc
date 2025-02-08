@@ -2,89 +2,52 @@
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
-"Disable filetype for now, as required by vundle, it will be re-enabled later
-filetype off
-
 "encoding sets how vim shall represent characters internally. Utf-8 is
 "necessary for most flavors of Unicode
 set encoding=utf-8
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-"Shorten the length of messages to help avoid 'press Enter' messages
-set shortmess=a
+call plug#begin()
 
 "The following require vim version >= 7.0
 if v:version >= 700
-    "Plugin 'altercation/vim-colors-solarized'
-    "Plugin 'gruvbox-community/gruvbox'
-    "Plugin 'lifepillar/vim-solarized8'
-    "Plugin 'lifepillar/vim-gruvbox8'
-    Plugin 'vim-scripts/sudo.vim'
-    Plugin 'nvie/vim-flake8'
-    Plugin 'tmux-plugins/vim-tmux'
-    Plugin 'xolox/vim-misc' " Required for vim-notes
-    Plugin 'xolox/vim-notes'
-    Plugin 'AndrewRadev/linediff.vim'
-    Plugin 'ludovicchabant/vim-lawrencium'
-    Plugin 'tpope/vim-fugitive'
-    Plugin 'derekwyatt/vim-scala'
-    Plugin 'vim-scripts/vcscommand.vim'
-    Plugin 'scrooloose/nerdtree'
-    Plugin 'godlygeek/tabular'
-    "Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
-    "Plugin 'Xuyuanp/nerdtree-git-plugin'
-    "Plugin 'f4t-t0ny/nerdtree-hg-plugin'
-    "Plugin 'mileszs/ack.vim'
-    Plugin 'Rykka/riv.vim'
-    Plugin 'chazy/cscope_maps'
-    Plugin 'tpope/vim-abolish'
-    Plugin 'chrisbra/csv.vim'
-    Plugin 'andymass/vim-matchup'
-    Plugin 'elzr/vim-json'
-    Plugin 'vim-scripts/repmo.vim'
-    Plugin 'PProvost/vim-ps1'
-    Plugin 'tpope/vim-unimpaired'
-    "Plugin 'ngemily/vim-vp4'
-    Plugin 'tommcdo/vim-lion'
-    Plugin 'AndrewRadev/sideways.vim'
-    "Plugin 'vim-scripts/LargeFile'
+    Plug 'nvie/vim-flake8'
+    Plug 'xolox/vim-misc' " Required for vim-notes
+    Plug 'xolox/vim-notes'
+    Plug 'AndrewRadev/linediff.vim'
+    Plug 'ludovicchabant/vim-lawrencium'
+    Plug 'tpope/vim-fugitive'
+    Plug 'derekwyatt/vim-scala'
+    Plug 'vim-scripts/vcscommand.vim'
+    Plug 'scrooloose/nerdtree'
+    Plug 'godlygeek/tabular'
+    Plug 'Rykka/riv.vim'
+    Plug 'chazy/cscope_maps'
+    Plug 'tpope/vim-abolish'
+    Plug 'chrisbra/csv.vim'
+    Plug 'andymass/vim-matchup'
+    Plug 'elzr/vim-json'
+    Plug 'vim-scripts/repmo.vim'
+    Plug 'PProvost/vim-ps1'
+    Plug 'tpope/vim-unimpaired'
+    Plug 'tommcdo/vim-lion'
+    Plug 'AndrewRadev/sideways.vim'
 endif
 
 "The following require vim version >= 7.2
 if v:version >= '702'
     " This plugin will still need to be compiled manually
-    Plugin 'Shougo/vimproc.vim'
-    Plugin 'ryanoasis/vim-devicons'
-    Plugin 'Shougo/unite.vim'
-    Plugin 'Shougo/neoyank.vim'
-    "Plugin 'vim-airline/vim-airline'
-    "Plugin 'vim-airline/vim-airline-themes'
+    Plug 'Shougo/vimproc.vim'
+    Plug 'ryanoasis/vim-devicons'
+    Plug 'Shougo/unite.vim'
+    Plug 'Shougo/neoyank.vim'
 endif
 
-"The following require vim version >= 7.3
-if v:version >= '703'
-    "Plugin 'Valloric/YouCompleteMe'
-    "Plugin 'lyuts/vim-rtags'
-endif
+" All of your Plugs must be added before the following line
+call plug#end()
 
-"The following require vim version >= 7.4
-"if v:version >= '704'
-"    Plugin 'junegunn/fzf'
-"    Plugin 'junegunn/fzf.vim' "Depends on fzf
-"endif
+"Shorten the length of messages to help avoid 'press Enter' messages
+set shortmess=a
 
-if v:version >= '800'
-    Plugin 'rbong/vim-crystalline'
-endif
-
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
 filetype plugin indent on    " required
 
 let g:webdevicons_enable = 0
@@ -280,30 +243,6 @@ endif
 
 " Enable syntax highlighting
 syntax enable
-
-""""""""""""""""""""""""""""""
-" solarized
-""""""""""""""""""""""""""""""
-"if v:version >= 700
-"    let g:solarized_use16=1
-"    set background=dark
-"    colorscheme solarized8
-"endif
-
-""""""""""""""""""""""""""""""
-" gruvbox
-""""""""""""""""""""""""""""""
-"if v:version >= 700
-"    let g:gruvbox_termcolors=16
-"    set background=dark
-"    colorscheme gruvbox
-"endif
-
-" Matchit is already installed in newer versions of vim.
-" Configure matchit so that it goes from opening tag to closing tag
-"if v:version >= 700
-"    runtime macros/matchit.vim
-"endif
 
 "Turn off automatic indentation for perl and python files when using # 
 "for comments

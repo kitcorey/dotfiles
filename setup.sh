@@ -2,10 +2,10 @@
 usage() { echo "Usage: $0 [-o force overwrite]" 1>&2; exit 1; }
 
 setup_vim() {
-    destination=$HOME/.vim/bundle/Vundle.vim
+    destination=$HOME/.vim/autoload/plug.vim
     created=false
     if [ ! -d "$destination" ] ; then
-        git clone https://github.com/VundleVim/Vundle.vim.git $destination
+        curl -fLo $destination --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         created=true
     fi
     if [ $overwrite = true ] || [ $created = true ] ; then
