@@ -308,8 +308,12 @@ set listchars=tab:>-
 " This is required for windows terminal and WSL for.. reasons
 " https://github.com/vim/vim/issues/6365
 if has("unix")
-  let lines = readfile("/proc/version")
-  if lines[0] =~ "Microsoft"
-	set t_u7=
-  endif
+  try
+    let lines = readfile("/proc/version")
+    if lines[0] =~ "Microsoft"
+      set t_u7=
+    endif
+  catch
+    " File doesn't exist or can't be read (e.g., on macOS)
+  endtry
 endif
