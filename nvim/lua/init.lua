@@ -71,3 +71,5 @@ vim.diagnostic.config({
     source = "always",  -- Or "if_many"
   },
 })
+
+vim.opt.laststatus = 3

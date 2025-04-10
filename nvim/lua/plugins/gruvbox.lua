@@ -12,5 +12,11 @@ return {
         options = {
             theme = "gruvbox"
         }
+    },
+    {
+        'akinsho/bufferline.nvim',
+        options = {
+            theme = "gruvbox"
+        }
     }
 }
