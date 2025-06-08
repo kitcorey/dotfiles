@@ -1,3 +1,18 @@
+# Install latest Neovim AppImage (Linux only)
+- name: Download latest Neovim AppImage
+  get_url:
+    url: https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+    dest: "{{ user_home }}/.local/bin/nvim.appimage"
+    mode: '0755'
+  when: ansible_facts['system'] == 'Linux'
+
+- name: Symlink nvim.appimage to nvim in PATH
+  file:
+    src: "{{ user_home }}/.local/bin/nvim.appimage"
+    dest: "{{ user_home }}/.local/bin/nvim"
+    state: link
+    force: true
+  when: ansible_facts['system'] == 'Linux'
 # Ensure zsh is the default shell (for Ubuntu/Debian)
 - name: Ensure zsh is installed (Debian/Ubuntu)
   apt:
@@ -47,7 +62,6 @@
       - gpg
       - python3-pip
       - python3-venv
-      - neovim
       - fzf
     state: present
     update_cache: yes
