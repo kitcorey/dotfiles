@@ -243,7 +243,6 @@
     curl https://sh.rustup.rs -sSf | sh -s -- -y
   args:
     creates: "{{ user_home }}/.cargo/bin/cargo"
-  register: rust_install_result
 
 - name: Install required rust packages (if not present)
   community.general.cargo:
@@ -253,8 +252,6 @@
       - zoxide
   when:
     - ansible_facts['os_family'] == 'Linux'
-    - rust_install_result is not skipped
-  register: cargo_install_result
 
 - name: Symlink starship.toml
   file:
@@ -262,8 +259,6 @@
     dest: "{{ user_home }}/.config/starship.toml"
     state: link
     force: true
-  when:
-    - cargo_install_result is not skipped
 
 - name: Install rvm (if not present)
   shell: |
