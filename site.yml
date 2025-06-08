@@ -4,5 +4,6 @@
   vars:
     dotfiles_repo: "{{ lookup('env', 'PWD') }}"
     user_home: "{{ lookup('env', 'HOME') }}"
+    install_rvm: false
   roles:
     - dotfiles
