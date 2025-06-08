@@ -1,2 +1,1 @@
-- src: https://github.com/rolehippie/ansible-role-starship
-  name: rolehippie.starship
+- src: rolehippie.starship
