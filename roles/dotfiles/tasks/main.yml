@@ -129,15 +129,6 @@
     state: link
     force: true
 
-- name: Symlink nvim/plugins
-  file:
-    src: "{{ dotfiles_repo }}/nvim/plugins"
-    dest: "{{ user_home }}/.config/nvim/plugins"
-    state: link
-    force: true
-    # Only if plugins exists
-  when: ansible_facts['os_family'] == 'Darwin' or ansible_facts['system'] == 'Linux'
-
 - name: Clone pyenv
   git:
     repo: https://github.com/pyenv/pyenv.git
