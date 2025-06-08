@@ -1,3 +1,19 @@
+# Ensure zsh is the default shell (for Ubuntu/Debian)
+- name: Ensure zsh is installed (Debian/Ubuntu)
+  apt:
+    name: zsh
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Set zsh as default shell for user (Debian/Ubuntu)
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: /usr/bin/zsh
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - ansible_facts['user_shell'] != '/usr/bin/zsh'
+  become: true
 ---
 - name: Ensure Homebrew is installed (macOS)
   homebrew:
