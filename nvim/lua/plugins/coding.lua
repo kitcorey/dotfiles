@@ -1,4 +1,5 @@
 return {
     'PeterRincker/vim-argumentative',
-	'towolf/vim-helm'
+    'towolf/vim-helm',
+    'github/copilot.vim',
 }
