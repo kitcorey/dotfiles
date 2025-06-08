@@ -259,6 +259,7 @@
     curl -sSL https://get.rvm.io | bash
   args:
     creates: "{{ user_home }}/.rvm/bin/rvm"
+  when: install_rvm
 
 - name: Ensure ~/repos/github exists
   file:
