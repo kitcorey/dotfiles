@@ -12,6 +12,10 @@ if [[ "$OS" == "Darwin" ]]; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
+    # Ensure /opt/homebrew/bin is in PATH
+    if [[ ":$PATH:" != *":/opt/homebrew/bin:"* ]]; then
+        export PATH="/opt/homebrew/bin:$PATH"
+    fi
     echo "Installing ansible via Homebrew..."
     brew install ansible
 elif [[ -f /etc/debian_version ]]; then

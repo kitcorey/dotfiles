@@ -20,7 +20,7 @@
     state: link
     force: true
   when: ansible_facts['system'] == 'Linux'
-# Ensure zsh is the default shell (for Ubuntu/Debian)
+
 - name: Ensure zsh is installed (Debian/Ubuntu)
   apt:
     name: zsh
@@ -42,6 +42,17 @@
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
+- name: Ensure /opt/homebrew/bin is in PATH in .zshrc (macOS)
+  lineinfile:
+    path: "{{ user_home }}/.zshrc"
+    regexp: '(^|\n)export PATH=/opt/homebrew/bin:\$PATH'
+    line: |
+      # Ensure Homebrew is in PATH
+      export PATH=/opt/homebrew/bin:$PATH
+    insertafter: EOF
+    state: present
+  when: ansible_facts['os_family'] == 'Darwin'
+
 - name: Install required packages (macOS)
   homebrew:
     name:
@@ -58,7 +69,6 @@
       - starship
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
-  become: true
 
 - name: Install required packages (Debian/Ubuntu)
   apt:
@@ -114,7 +124,6 @@
     src: "{{ dotfiles_repo }}/vim/after"
     dest: "{{ user_home }}/.vim/after"
     owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
     mode: '0755'
 
 - name: Ensure ~/.config directory exists
@@ -234,6 +243,8 @@
     repo: https://github.com/junegunn/fzf.git
     dest: "{{ user_home }}/.fzf"
     update: yes
+  when:
+    - ansible_facts['system'] == 'Linux'
 
 - name: Install fzf key bindings and completion
   shell: |
