@@ -13,7 +13,10 @@
     mode: '0644'
   when: ansible_facts['os_family'] == 'Darwin'
 
-- name: Import Gruvbox Dark color preset into iTerm2 (macOS)
+- name: Import Gruvbox Dark color preset into iTerm2 (macOS, idempotent)
   shell: |
     osascript -e 'tell application "iTerm2" to open POSIX file "{{ user_home }}/.config/iterm2-colors/gruvbox-dark.itermcolors"'
+    touch "{{ user_home }}/.config/iterm2-colors/.gruvbox-dark-imported"
+  args:
+    creates: "{{ user_home }}/.config/iterm2-colors/.gruvbox-dark-imported"
   when: ansible_facts['os_family'] == 'Darwin'
