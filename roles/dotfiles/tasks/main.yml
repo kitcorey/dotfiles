@@ -155,6 +155,7 @@
 - name: Install starship prompt using rolehippie.starship
   include_role:
     name: rolehippie.starship
+  become: true
 
 - name: Symlink starship.toml
   file:
