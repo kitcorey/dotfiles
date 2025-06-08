@@ -168,11 +168,23 @@
     dest: "{{ user_home }}/.cshrc"
     mode: '0644'
 
-- name: Copy inputrc
   copy:
     src: "{{ dotfiles_repo }}/inputrc"
     dest: "{{ user_home }}/.inputrc"
     mode: '0644'
+- name: Copy inputrc file
+  copy:
+    src: "{{ dotfiles_repo }}/inputrc"
+    dest: "{{ user_home }}/.inputrc"
+    mode: '0644'
+
+
+# Ensure ~/.shellrc exists before symlinking bashrc.d and zshrc.d
+- name: Ensure ~/.shellrc directory exists
+  file:
+    path: "{{ user_home }}/.shellrc"
+    state: directory
+    mode: '0755'
 
 - name: Symlink bashrc.d
   file:
