@@ -199,10 +199,11 @@
   lineinfile:
     path: "{{ user_home }}/.zshrc"
     regexp: '(^|\n)export PATH=\\$HOME/\\.local/bin:\\$PATH'
-    line: 'export PATH="$HOME/.local/bin:$PATH"'
+    line: |
+      # Ensure ~/.local/bin is in PATH for user-installed binaries
+      export PATH="$HOME/.local/bin:$PATH"
     insertafter: EOF
     state: present
-  when: ansible_facts['user_shell'] is search('zsh')
 
 - name: Symlink bashrc.d
   file:
@@ -284,6 +285,17 @@
     dest: "{{ user_home }}/.config/starship.toml"
     state: link
     force: true
+
+# Ensure starship prompt is initialized in .zshrc
+- name: Ensure starship prompt is initialized in .zshrc
+  lineinfile:
+    path: "{{ user_home }}/.zshrc"
+    regexp: '(^|\n)eval "\$\(\s*starship init zsh\s*\)"'
+    line: |
+      # Starting the starship prompt should be done last
+      eval "$(starship init zsh)"
+    insertafter: EOF
+    state: present
 
 - name: Install rvm (if not present)
   shell: |
