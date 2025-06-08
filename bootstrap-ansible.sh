@@ -10,7 +10,7 @@ if [[ "$OS" == "Darwin" ]]; then
     if ! command -v brew >/dev/null 2>&1; then
         echo "Homebrew not found. Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        eval "$($(brew --prefix)/bin/brew shellenv)"
+        eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     echo "Installing ansible via Homebrew..."
     brew install ansible
