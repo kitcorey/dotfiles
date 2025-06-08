@@ -49,8 +49,6 @@
       - python3-venv
       - neovim
       - fzf
-      - ripgrep
-      - starship
     state: present
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
@@ -152,13 +150,6 @@
     dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
     update: yes
 
-- name: Symlink starship.toml
-  file:
-    src: "{{ dotfiles_repo }}/starship.toml"
-    dest: "{{ user_home }}/.config/starship.toml"
-    state: link
-    force: true
-
 - name: Clone tmux plugin manager
   git:
     repo: https://github.com/tmux-plugins/tpm
@@ -244,20 +235,35 @@
   shell: |
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
   args:
-    creates: "{{ user_home }}/.cargo/bin/zoxide"
+    creates: "{{ user_home }}/.local/bin/zoxide"
+
 
 - name: Install rust (if not present)
   shell: |
     curl https://sh.rustup.rs -sSf | sh -s -- -y
   args:
     creates: "{{ user_home }}/.cargo/bin/cargo"
+  register: rust_install_result
 
-- name: Install ripgrep (if not present)
-  shell: |
-    cargo install ripgrep
-  args:
-    creates: "{{ user_home }}/.cargo/bin/rg"
-  when: ansible_facts['os_family'] == 'Darwin' or ansible_facts['os_family'] == 'Linux'
+- name: Install required rust packages (if not present)
+  community.general.cargo:
+    name:
+      - starship
+      - ripgrep
+      - zoxide
+  when:
+    - ansible_facts['os_family'] == 'Linux'
+    - rust_install_result is not skipped
+  register: cargo_install_result
+
+- name: Symlink starship.toml
+  file:
+    src: "{{ dotfiles_repo }}/starship.toml"
+    dest: "{{ user_home }}/.config/starship.toml"
+    state: link
+    force: true
+  when:
+    - cargo_install_result is not skipped
 
 - name: Install rvm (if not present)
   shell: |
