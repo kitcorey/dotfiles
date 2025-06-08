@@ -189,6 +189,16 @@
     state: directory
     mode: '0755'
 
+# Ensure ~/.local/bin is in PATH in .zshrc
+- name: Ensure ~/.local/bin is in PATH in .zshrc
+  lineinfile:
+    path: "{{ user_home }}/.zshrc"
+    regexp: '(^|\n)export PATH=\\$HOME/\\.local/bin:\\$PATH'
+    line: 'export PATH="$HOME/.local/bin:$PATH"'
+    insertafter: EOF
+    state: present
+  when: ansible_facts['user_shell'] is search('zsh')
+
 - name: Symlink bashrc.d
   file:
     src: "{{ dotfiles_repo }}/bashrc.d"
