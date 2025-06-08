@@ -45,11 +45,9 @@
 - name: Ensure /opt/homebrew/bin is in PATH in .zshrc (macOS)
   lineinfile:
     path: "{{ user_home }}/.zshrc"
-    regexp: '(^|\n)export PATH=/opt/homebrew/bin:\$PATH'
-    line: |
-      # Ensure Homebrew is in PATH
-      export PATH=/opt/homebrew/bin:$PATH
-    insertbefore: BOF
+    regexp: '(^|\n)\s*export\s+PATH=.*\/opt\/homebrew\/bin.*:\$PATH'
+    line: 'export PATH=/opt/homebrew/bin:$PATH'
+    insertafter: BOF
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -269,10 +267,8 @@
 - name: Ensure ~/.local/bin is in PATH in .zshrc
   lineinfile:
     path: "{{ user_home }}/.zshrc"
-    regexp: '(^|\n)export PATH=\\$HOME/\\.local/bin:\\$PATH'
-    line: |
-      # Ensure ~/.local/bin is in PATH for user-installed binaries
-      export PATH="$HOME/.local/bin:$PATH"
+    regexp: '(^|\n)\s*export\s+PATH=.*\.local/bin.*:\$PATH'
+    line: 'export PATH="$HOME/.local/bin:$PATH"'
     insertafter: EOF
     state: present
 
@@ -294,14 +290,11 @@
     state: link
     force: true
 
-# Ensure starship prompt is initialized in .zshrc
 - name: Ensure starship prompt is initialized in .zshrc
   lineinfile:
     path: "{{ user_home }}/.zshrc"
-    regexp: '(^|\n)eval "\$\(\s*starship init zsh\s*\)"'
-    line: |
-      # Starting the starship prompt should be done last
-      eval "$(starship init zsh)"
+    regexp: '^\s*eval\s*"\$\(\s*starship\s+init\s+zsh\s*\)"'
+    line: 'eval "$(starship init zsh)"'
     insertafter: EOF
     state: present
 
