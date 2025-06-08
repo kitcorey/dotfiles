@@ -25,7 +25,6 @@
     name:
       - git
       - tmux
-      - starship
       - zoxide
       - ripgrep
       - pyenv
@@ -34,6 +33,7 @@
       - curl
       - gpg
       - rust
+      - starship
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
   become: true
@@ -50,6 +50,7 @@
       - neovim
       - fzf
       - ripgrep
+      - starship
     state: present
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
@@ -150,22 +151,6 @@
     repo: https://github.com/pyenv/pyenv-virtualenv.git
     dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
     update: yes
-
-- name: Install starship prompt system-wide using rolehippie.starship (Linux)
-  include_role:
-    name: rolehippie.starship
-    apply:
-      become: true
-  vars:
-    starship_install_method: package
-  when: ansible_facts['os_family'] == 'Linux'
-
-- name: Install starship prompt using Homebrew (Darwin)
-  homebrew:
-    name: starship
-    state: present
-  when: ansible_facts['os_family'] == 'Darwin'
-  become: true
 
 - name: Symlink starship.toml
   file:
