@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  gather_facts: true
+  vars:
+    dotfiles_repo: "{{ lookup('env', 'PWD') }}"
+    user_home: "{{ lookup('env', 'HOME') }}"
+  roles:
+    - dotfiles

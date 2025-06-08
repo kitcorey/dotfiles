@@ -1,0 +1,255 @@
+---
+- name: Ensure Homebrew is installed (macOS)
+  homebrew:
+    state: present
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- name: Install required packages (macOS)
+  homebrew:
+    name:
+      - git
+      - tmux
+      - starship
+      - zoxide
+      - ripgrep
+      - pyenv
+      - neovim
+      - fzf
+      - curl
+      - gpg
+      - rust
+    state: present
+  when: ansible_facts['os_family'] == 'Darwin'
+  become: true
+
+- name: Install required packages (Debian/Ubuntu)
+  apt:
+    name:
+      - git
+      - tmux
+      - curl
+      - gpg
+      - python3-pip
+      - python3-venv
+      - neovim
+      - fzf
+      - ripgrep
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Install required packages (RedHat/CentOS)
+  yum:
+    name:
+      - git
+      - tmux
+      - curl
+      - gpg
+      - python3-pip
+      - python3-venv
+      - neovim
+      - fzf
+      - ripgrep
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Ensure ~/.vim/autoload directory exists
+  file:
+    path: "{{ user_home }}/.vim/autoload"
+    state: directory
+    mode: '0755'
+
+- name: Download vim-plug
+  get_url:
+    url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    dest: "{{ user_home }}/.vim/autoload/plug.vim"
+    mode: '0644'
+
+- name: Symlink .vimrc
+  file:
+    src: "{{ dotfiles_repo }}/vimrc"
+    dest: "{{ user_home }}/.vimrc"
+    state: link
+    force: true
+
+- name: Copy vim/after directory
+  copy:
+    src: "{{ dotfiles_repo }}/vim/after"
+    dest: "{{ user_home }}/.vim/after"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
+
+- name: Ensure ~/.config directory exists
+  file:
+    path: "{{ user_home }}/.config"
+    state: directory
+    mode: '0755'
+
+- name: Copy flake8 config
+  copy:
+    src: "{{ dotfiles_repo }}/flake8"
+    dest: "{{ user_home }}/.config/flake8"
+    mode: '0644'
+
+- name: Ensure ~/.config/nvim exists
+  file:
+    path: "{{ user_home }}/.config/nvim"
+    state: directory
+    mode: '0755'
+
+- name: Symlink nvim/init.vim
+  file:
+    src: "{{ dotfiles_repo }}/nvim/init.vim"
+    dest: "{{ user_home }}/.config/nvim/init.vim"
+    state: link
+    force: true
+
+- name: Symlink nvim/lua
+  file:
+    src: "{{ dotfiles_repo }}/nvim/lua"
+    dest: "{{ user_home }}/.config/nvim/lua"
+    state: link
+    force: true
+
+- name: Symlink nvim/plugins
+  file:
+    src: "{{ dotfiles_repo }}/nvim/plugins"
+    dest: "{{ user_home }}/.config/nvim/plugins"
+    state: link
+    force: true
+    # Only if plugins exists
+  when: ansible_facts['os_family'] == 'Darwin' or ansible_facts['os_family'] == 'Linux'
+
+- name: Clone pyenv
+  git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: "{{ user_home }}/.pyenv"
+    update: yes
+
+- name: Clone pyenv-virtualenv
+  git:
+    repo: https://github.com/pyenv/pyenv-virtualenv.git
+    dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
+    update: yes
+
+- name: Install starship (if not present)
+  shell: |
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
+  args:
+    creates: "{{ user_home }}/.cargo/bin/starship"
+  when: ansible_facts['os_family'] == 'Darwin' or ansible_facts['os_family'] == 'Linux'
+
+- name: Symlink starship.toml
+  file:
+    src: "{{ dotfiles_repo }}/starship.toml"
+    dest: "{{ user_home }}/.config/starship.toml"
+    state: link
+    force: true
+
+- name: Clone tmux plugin manager
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ user_home }}/.tmux/plugins/tpm"
+    update: yes
+
+- name: Symlink tmux.conf
+  file:
+    src: "{{ dotfiles_repo }}/tmux.conf"
+    dest: "{{ user_home }}/.tmux.conf"
+    state: link
+    force: true
+
+- name: Copy cshrc
+  copy:
+    src: "{{ dotfiles_repo }}/cshrc"
+    dest: "{{ user_home }}/.cshrc"
+    mode: '0644'
+
+- name: Copy inputrc
+  copy:
+    src: "{{ dotfiles_repo }}/inputrc"
+    dest: "{{ user_home }}/.inputrc"
+    mode: '0644'
+
+- name: Symlink bashrc.d
+  file:
+    src: "{{ dotfiles_repo }}/bashrc.d"
+    dest: "{{ user_home }}/.shellrc/bashrc.d"
+    state: link
+    force: true
+
+- name: Symlink zshrc.d
+  file:
+    src: "{{ dotfiles_repo }}/zshrc.d"
+    dest: "{{ user_home }}/.shellrc/zshrc.d"
+    state: link
+    force: true
+
+- name: Symlink .zshrc
+  file:
+    src: "{{ dotfiles_repo }}/zshrc"
+    dest: "{{ user_home }}/.zshrc"
+    state: link
+    force: true
+
+- name: Symlink .gitconfig
+  file:
+    src: "{{ dotfiles_repo }}/gitconfig"
+    dest: "{{ user_home }}/.gitconfig"
+    state: link
+    force: true
+
+- name: Symlink .gitignore
+  file:
+    src: "{{ dotfiles_repo }}/gitignore"
+    dest: "{{ user_home }}/.gitignore"
+    state: link
+    force: true
+
+- name: Clone fzf
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: "{{ user_home }}/.fzf"
+    update: yes
+
+- name: Install fzf key bindings and completion
+  shell: |
+    {{ user_home }}/.fzf/install --key-bindings --completion --no-update-rc
+  args:
+    chdir: "{{ user_home }}/.fzf"
+    creates: "{{ user_home }}/.fzf.bash"
+
+- name: Install zoxide (if not present)
+  shell: |
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+  args:
+    creates: "{{ user_home }}/.cargo/bin/zoxide"
+
+- name: Install rust (if not present)
+  shell: |
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+  args:
+    creates: "{{ user_home }}/.cargo/bin/cargo"
+
+- name: Install ripgrep (if not present)
+  shell: |
+    cargo install ripgrep
+  args:
+    creates: "{{ user_home }}/.cargo/bin/rg"
+  when: ansible_facts['os_family'] == 'Darwin' or ansible_facts['os_family'] == 'Linux'
+
+- name: Install rvm (if not present)
+  shell: |
+    gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+    curl -sSL https://get.rvm.io | bash
+  args:
+    creates: "{{ user_home }}/.rvm/bin/rvm"
+
+- name: Ensure ~/repos/github exists
+  file:
+    path: "{{ user_home }}/repos/github"
+    state: directory
+    mode: '0755'
