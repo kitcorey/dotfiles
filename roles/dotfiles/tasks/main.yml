@@ -152,9 +152,19 @@
     update: yes
 
 
-- name: Install starship prompt using rolehippie.starship
+- name: Install starship prompt system-wide using rolehippie.starship (Linux)
   include_role:
     name: rolehippie.starship
+  vars:
+    starship_install_method: package
+  become: true
+  when: ansible_facts['os_family'] == 'Linux'
+
+- name: Install starship prompt using Homebrew (Darwin)
+  homebrew:
+    name: starship
+    state: present
+  when: ansible_facts['os_family'] == 'Darwin'
   become: true
 
 - name: Symlink starship.toml
