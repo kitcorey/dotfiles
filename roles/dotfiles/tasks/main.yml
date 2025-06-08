@@ -49,7 +49,7 @@
     line: |
       # Ensure Homebrew is in PATH
       export PATH=/opt/homebrew/bin:$PATH
-    insertafter: EOF
+    insertbefore: BOF
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
