@@ -1,7 +1,9 @@
 # Install latest Neovim AppImage (Linux only)
 - name: Download latest Neovim AppImage
   get_url:
-    url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+    url: >-
+      https://github.com/neovim/neovim/releases/latest/download/
+      nvim-linux-{{ 'arm64' if ansible_facts['architecture'] in ['aarch64', 'arm64'] else 'x86_64' }}.appimage
     dest: "{{ user_home }}/.local/bin/nvim.appimage"
     mode: '0755'
   when: ansible_facts['system'] == 'Linux'
