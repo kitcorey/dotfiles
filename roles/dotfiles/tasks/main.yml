@@ -194,17 +194,6 @@
     state: directory
     mode: '0755'
 
-# Ensure ~/.local/bin is in PATH in .zshrc
-- name: Ensure ~/.local/bin is in PATH in .zshrc
-  lineinfile:
-    path: "{{ user_home }}/.zshrc"
-    regexp: '(^|\n)export PATH=\\$HOME/\\.local/bin:\\$PATH'
-    line: |
-      # Ensure ~/.local/bin is in PATH for user-installed binaries
-      export PATH="$HOME/.local/bin:$PATH"
-    insertafter: EOF
-    state: present
-
 - name: Symlink bashrc.d
   file:
     src: "{{ dotfiles_repo }}/bashrc.d"
@@ -266,8 +255,16 @@
   args:
     creates: "{{ user_home }}/.cargo/bin/cargo"
 
+- name: Ensure ~/.local/bin is in PATH in .zshrc
+  lineinfile:
+    path: "{{ user_home }}/.zshrc"
+    regexp: '(^|\n)export PATH=\\$HOME/\\.local/bin:\\$PATH'
+    line: |
+      # Ensure ~/.local/bin is in PATH for user-installed binaries
+      export PATH="$HOME/.local/bin:$PATH"
+    insertafter: EOF
+    state: present
 
-# Ensure cargo is in PATH for rust package installs
 - name: Install required rust packages (if not present)
   community.general.cargo:
     name:
