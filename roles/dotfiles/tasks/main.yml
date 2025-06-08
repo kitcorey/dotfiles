@@ -151,13 +151,13 @@
     dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
     update: yes
 
-
 - name: Install starship prompt system-wide using rolehippie.starship (Linux)
   include_role:
     name: rolehippie.starship
+    apply:
+      become: true
   vars:
     starship_install_method: package
-  become: true
   when: ansible_facts['os_family'] == 'Linux'
 
 - name: Install starship prompt using Homebrew (Darwin)
