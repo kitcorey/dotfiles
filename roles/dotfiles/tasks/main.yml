@@ -69,7 +69,6 @@
       - gpg
       - python3-pip
       - python3-venv
-      - fzf
     state: present
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
