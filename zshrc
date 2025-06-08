@@ -8,6 +8,9 @@ if [ -d $HOME/.shellrc/zshrc.d ]; then
   done
 fi
 
+# Use emacs keybindings
+bindkey -e
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Starting the starship prompt should be done last
