@@ -266,12 +266,16 @@
   args:
     creates: "{{ user_home }}/.cargo/bin/cargo"
 
+
+# Ensure cargo is in PATH for rust package installs
 - name: Install required rust packages (if not present)
   community.general.cargo:
     name:
       - starship
       - ripgrep
       - zoxide
+  environment:
+    PATH: "{{ user_home }}/.cargo/bin:{{ ansible_env.PATH }}"
   when:
     - ansible_facts['system'] == 'Linux'
 
