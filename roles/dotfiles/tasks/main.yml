@@ -65,7 +65,12 @@
       - gpg
       - rust
       - starship
-    state: present
+      - iterm2
+
+
+# iTerm2 Gruvbox Dark colorscheme setup (macOS)
+- name: Include iTerm2 Gruvbox Dark colorscheme setup
+  import_tasks: iterm2_colors.yml
   when: ansible_facts['os_family'] == 'Darwin'
 
 - name: Install required packages (Debian/Ubuntu)

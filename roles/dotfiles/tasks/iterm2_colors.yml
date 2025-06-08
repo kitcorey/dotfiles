@@ -1,0 +1,19 @@
+# iTerm2 Gruvbox Dark colorscheme setup (macOS)
+- name: Ensure ~/.config/iterm2-colors directory exists (macOS)
+  file:
+    path: "{{ user_home }}/.config/iterm2-colors"
+    state: directory
+    mode: '0755'
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- name: Download Gruvbox Dark iTerm2 color preset (macOS)
+  get_url:
+    url: https://raw.githubusercontent.com/morhetz/gruvbox-contrib/master/iterm2/gruvbox-dark.itermcolors
+    dest: "{{ user_home }}/.config/iterm2-colors/gruvbox-dark.itermcolors"
+    mode: '0644'
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- name: Import Gruvbox Dark color preset into iTerm2 (macOS)
+  shell: |
+    osascript -e 'tell application "iTerm2" to open POSIX file "{{ user_home }}/.config/iterm2-colors/gruvbox-dark.itermcolors"'
+  when: ansible_facts['os_family'] == 'Darwin'
