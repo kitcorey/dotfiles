@@ -151,12 +151,10 @@
     dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
     update: yes
 
-- name: Install starship (if not present)
-  shell: |
-    curl -sS https://starship.rs/install.sh | sh -s -- -y
-  args:
-    creates: "{{ user_home }}/.cargo/bin/starship"
-  when: ansible_facts['os_family'] == 'Darwin' or ansible_facts['os_family'] == 'Linux'
+
+- name: Install starship prompt using rolehippie.starship
+  include_role:
+    name: rolehippie.starship
 
 - name: Symlink starship.toml
   file:
