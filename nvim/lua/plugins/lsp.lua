@@ -1,33 +1,35 @@
 return {
-	{
-		"neovim/nvim-lspconfig",
-		config = function(_, opts)
-			require('lspconfig').clangd.setup{
-				cmd = { 'clangd' }
-			--         'cclangd',
-			--         'iadp_test',
-			--     },
-			}
-			require'lspconfig'.pyright.setup{
-				-- Disable "help" diagnostics
-				-- https://github.com/neovim/nvim-lspconfig/issues/726#issuecomment-1439132189
-				capabilities = (function()
-					local capabilities = vim.lsp.protocol.make_client_capabilities()
-					capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 }
-					return capabilities
-				end)(),
-				settings = {
-					python = {
-						pythonPath = vim.fn.exepath("python"),
-					},
-				},
-			}
-			require'lspconfig'.ruff.setup{}
-			require'lspconfig'.ruby_lsp.setup{}
-			require'lspconfig'.rubocop.setup{}
-			-- require'lspconfig'.solargraph.setup{}
-		end
-	},
+    {
+        "neovim/nvim-lspconfig",
+        config = function(_, opts)
+            vim.lsp.config("clangd", {
+                cmd = { 'clangd' }
+            --         'cclangd',
+            --         'iadp_test',
+            --     },
+            })
+            vim.lsp.config("pyright", {
+                -- Disable "help" diagnostics
+                -- https://github.com/neovim/nvim-lspconfig/issues/726#issuecomment-1439132189
+                capabilities = (function()
+                    local capabilities = vim.lsp.protocol.make_client_capabilities()
+                    capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 }
+                    return capabilities
+                end)(),
+                settings = {
+                    python = {
+                        pythonPath = vim.fn.exepath("python"),
+                    },
+                },
+            })
+            vim.lsp.config("ruff", {})
+            vim.lsp.config("ruby_lsp", {})
+            vim.lsp.config("rubocop", {})
+            vim.lsp.config("rubocop", {})
+            vim.lsp.config("gopls", {})
+            -- vim.lsp.config("solargraph", {})
+        end
+    },
     {
         "nvim-treesitter/nvim-treesitter-context",
         config = function()

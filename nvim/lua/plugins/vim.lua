@@ -17,5 +17,5 @@ return {
     {'PProvost/vim-ps1'},
     {'tpope/vim-unimpaired'},
     {'tommcdo/vim-lion'},
-    {'AndrewRadev/sideways.vim'}
+    -- {'AndrewRadev/sideways.vim'}
 }
