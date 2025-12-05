@@ -63,7 +63,7 @@ return {
                 -- Instead of true it can also be a list of languages
                 additional_vim_regex_highlighting = false,
                 sync_install = false,
-                ensure_installed = { "python", "ruby", "yaml" }
+                ensure_installed = { "python", "ruby", "yaml", "go" }
                 })
         end
     },
