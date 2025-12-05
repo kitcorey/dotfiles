@@ -6,3 +6,4 @@
 
 alias vi=nvim
 export EDITOR="nvim"
+alias vimdiff='nvim -d'

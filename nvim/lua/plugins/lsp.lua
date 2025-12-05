@@ -43,10 +43,10 @@ return {
     },
     {
         "lukas-reineke/indent-blankline.nvim",
-		main = "ibl",
-		---@module "ibl"
-		---@type ibl.config
-		opts = {}
+        main = "ibl",
+        ---@module "ibl"
+        ---@type ibl.config
+        opts = {}
     },
     {
         "nvim-treesitter/nvim-treesitter",

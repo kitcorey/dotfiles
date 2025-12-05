@@ -6,6 +6,9 @@ set nocompatible
 "necessary for most flavors of Unicode
 set encoding=utf-8
 
+" Set leader key to space
+let mapleader = " "
+
 "Loaded by lazy.vim via plugins/vim.lua in neovim
 if !has('nvim')
   call plug#begin()
@@ -242,14 +245,7 @@ nnoremap <M-.> :call search('^'. matchstr(getline('.'), '\(^\s*\)') .'\%>' . lin
 "autocmd FileType vim let w:m2=matchadd('ErrorMsg', '\%>100v.\+', -1)
 "autocmd FileType python let w:m2=matchadd('ErrorMsg', '\%>105v.\+', -1)
 
-""""""""""""""""""""""""""""""
-" YouCompleteMe
-""""""""""""""""""""""""""""""
-let g:ycm_filetype_whitelist = { 'c': 1, 'cpp': 1 }
-let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
-let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
-let g:ycm_extra_conf_globlist = ['~/repos/*']
-" completions
+" Set completion options for insert mode and command-line mode
 set completeopt=longest,menuone
 set wildmode=longest,list:longest
 
