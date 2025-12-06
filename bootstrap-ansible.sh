@@ -39,5 +39,9 @@ fi
 echo "Ansible installation complete. Version info:"
 ansible --version
 
+# ansible is not compatible with the default version of sudo in Ubuntu 25.10:
+# https://github.com/ansible/ansible/issues/85837
 echo "You can now run:"
 echo "  ansible-playbook -K site.yml"
+echo "OR for Ubuntu 25.10:"
+echo "  ANSIBLE_BECOME_EXE=sudo.ws ansible-playbook -K site.yml"

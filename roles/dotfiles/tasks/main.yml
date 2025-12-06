@@ -26,7 +26,6 @@
     name: zsh
     state: present
   when: ansible_facts['os_family'] == 'Debian'
-  become: true
 
 - name: Set zsh as default shell for user (Debian/Ubuntu)
   user:
