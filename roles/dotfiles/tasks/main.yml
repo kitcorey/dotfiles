@@ -263,6 +263,10 @@
   args:
     creates: "{{ user_home }}/.cargo/bin/cargo"
 
+- name: Update rust toolchain
+  shell: "{{ user_home }}/.cargo/bin/rustup update stable"
+  changed_when: false
+
 - name: Ensure ~/.local/bin is in PATH in .zshrc
   lineinfile:
     path: "{{ user_home }}/.zshrc"
