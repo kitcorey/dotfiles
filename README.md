@@ -31,6 +31,7 @@ ansible-playbook site.yml --ask-become-pass -e install_rvm=true
 - **tmux** + tpm (plugin manager)
 - **Rust** / cargo — via rustup (Linux) or Homebrew (macOS)
 - **vim-plug** — Vim plugin manager
+- **aichat** — AI CLI chat tool, via Homebrew (macOS) or cargo (Linux)
 
 ## Dotfiles managed
 
@@ -41,5 +42,13 @@ Symlinks created in `$HOME`:
 - `.tmux.conf`
 - `.gitconfig`, `.gitignore`
 - `.config/starship.toml`
+- `<user-config-dir>/aichat`
 
 Copied (not symlinked): `.cshrc`, `.inputrc`, `.config/flake8`
+
+### aichat API keys
+
+The aichat `config.yaml` does not contain API keys. Create `aichat/.env` in this repo (gitignored) with your credentials:
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```

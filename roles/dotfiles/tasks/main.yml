@@ -64,6 +64,7 @@
       - gpg
       - rust
       - starship
+      - aichat
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -160,12 +161,14 @@
     repo: https://github.com/pyenv/pyenv.git
     dest: "{{ user_home }}/.pyenv"
     update: yes
+  when: ansible_facts['system'] == 'Linux'
 
 - name: Clone pyenv-virtualenv
   git:
     repo: https://github.com/pyenv/pyenv-virtualenv.git
     dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
     update: yes
+  when: ansible_facts['system'] == 'Linux'
 
 - name: Clone tmux plugin manager
   git:
@@ -281,6 +284,7 @@
       - starship
       - ripgrep
       - zoxide
+      - aichat
   environment:
     PATH: "{{ user_home }}/.cargo/bin:{{ ansible_env.PATH }}"
   when:
@@ -292,6 +296,22 @@
     dest: "{{ user_home }}/.config/starship.toml"
     state: link
     force: true
+
+- name: Symlink aichat config directory (macOS)
+  file:
+    src: "{{ dotfiles_repo }}/aichat"
+    dest: "{{ user_home }}/Library/Application Support/aichat"
+    state: link
+    force: true
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- name: Symlink aichat config directory (Linux)
+  file:
+    src: "{{ dotfiles_repo }}/aichat"
+    dest: "{{ user_home }}/.config/aichat"
+    state: link
+    force: true
+  when: ansible_facts['system'] == 'Linux'
 
 - name: Ensure starship prompt is initialized in .zshrc
   lineinfile:
