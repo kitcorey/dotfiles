@@ -1,0 +1,45 @@
+# see https://github.com/sigoden/aichat/blob/main/config.example.yaml
+
+model: ollama:glm-4.7-flash:latest
+clients:
+- type: claude
+  # api_key omitted — set ANTHROPIC_API_KEY in the aichat config dir .env file:
+  #   macOS: ~/Library/Application Support/aichat/.env
+  #   Linux: ~/.config/aichat/.env
+- type: openai-compatible
+  name: ollama
+  api_base: http://localhost:11434/v1
+  models:
+    - name: llama3.2
+      max_input_tokens: 131072
+      supports_function_calling: true
+    - name: glm-4.7-flash:latest
+      max_input_tokens: 131072
+      supports_reasoning: true
+    - name: deepseek-r1:70b
+      max_input_tokens: 131072
+      supports_reasoning: true
+    - name: llama3.3:70b
+      max_input_tokens: 131072
+    - name: gemma3:27b
+      max_input_tokens: 131072
+    - name: nomic-embed-text
+      type: embedding
+      max_tokens_per_chunk: 8192
+      default_chunk_size: 1000
+      max_batch_size: 50
+    - name: mxbai-embed-large
+      type: embedding
+      max_tokens_per_chunk: 8192
+      default_chunk_size: 1000
+      max_batch_size: 50
+    - name: linux6200/bge-reranker-v2-m3
+      type: reranker
+      max_input_tokens: 4096
+- type: openai-compatible
+  name: lms
+  api_base: http://localhost:11435/v1
+  models:
+    - name: qwen3-30b-a3b
+      max_input_tokens: 131072
+      supports_reasoning: true
