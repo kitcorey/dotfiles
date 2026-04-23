@@ -65,6 +65,7 @@
       - rust
       - starship
       - aichat
+      - 1password-cli
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -82,6 +83,30 @@
   when: ansible_facts['os_family'] == 'Debian'
   become: true
 
+- name: Add 1Password apt signing key (Debian/Ubuntu)
+  ansible.builtin.get_url:
+    url: https://downloads.1password.com/linux/keys/1password.asc
+    dest: /usr/share/keyrings/1password-archive-keyring.asc
+    mode: '0644'
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Add 1Password apt repository (Debian/Ubuntu)
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/1password-archive-keyring.asc] https://downloads.1password.com/linux/debian/amd64 stable main"
+    filename: 1password
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Install 1Password CLI (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name: 1password-cli
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
 - name: Install required packages (RedHat/CentOS)
   yum:
     name:
@@ -94,6 +119,30 @@
       - neovim
       - fzf
       - ripgrep
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Add 1Password rpm signing key (RedHat)
+  ansible.builtin.rpm_key:
+    key: https://downloads.1password.com/linux/keys/1password.asc
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Add 1Password yum repository (RedHat)
+  ansible.builtin.yum_repository:
+    name: 1password
+    description: 1Password Stable Channel
+    baseurl: https://downloads.1password.com/linux/rpm/stable/x86_64
+    gpgcheck: yes
+    gpgkey: https://downloads.1password.com/linux/keys/1password.asc
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Install 1Password CLI (RedHat)
+  ansible.builtin.yum:
+    name: 1password-cli
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
   become: true
