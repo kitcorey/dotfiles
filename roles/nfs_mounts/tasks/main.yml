@@ -1,0 +1,55 @@
+# Skip the whole role cleanly when no mounts are configured for this host.
+- name: Detect whether any NFS mounts are configured for this host
+  set_fact:
+    # `default([], true)` also treats null/empty as "no mounts", so the local
+    # vars file can leave `nfs_mounts:` unset without blowing up.
+    nfs_mounts_enabled: "{{ (nfs_mounts | default([], true)) | length > 0 }}"
+
+- name: Install NFS client (Debian/Ubuntu)
+  apt:
+    name: nfs-common
+    state: present
+    update_cache: yes
+  become: true
+  when:
+    - nfs_mounts_enabled
+    - ansible_facts['os_family'] == 'Debian'
+
+- name: Install NFS client (RedHat/Fedora)
+  package:
+    name: nfs-utils
+    state: present
+  become: true
+  when:
+    - nfs_mounts_enabled
+    - ansible_facts['os_family'] == 'RedHat'
+
+- name: Ensure mount points exist
+  # No `mode` or `owner` here on purpose — on re-runs these paths may already
+  # be mounted NFS roots, and enforcing perms sends a chmod/chown to the NAS
+  # which is rejected under root_squash (EPERM). With no mode set, ansible
+  # only creates the dir when missing and leaves existing dirs alone.
+  file:
+    path: "{{ item.mount_point }}"
+    state: directory
+  become: true
+  loop: "{{ nfs_mounts | default([], true) }}"
+  when:
+    - nfs_mounts_enabled
+    - ansible_facts['system'] == 'Linux'
+    # Skip dir creation for entries we're explicitly removing; otherwise we'd
+    # race the mount task and re-create the path we just unmounted.
+    - item.state | default('mounted') not in ['absent', 'unmounted']
+
+- name: Configure /etc/fstab entry and mount NFS share
+  ansible.posix.mount:
+    src: "{{ item.server }}:{{ item.share }}"
+    path: "{{ item.mount_point }}"
+    fstype: "{{ item.fstype | default(nfs_mount_default_fstype) }}"
+    opts: "{{ item.opts | default(nfs_mount_default_opts) }}"
+    state: "{{ item.state | default('mounted') }}"
+  become: true
+  loop: "{{ nfs_mounts | default([], true) }}"
+  when:
+    - nfs_mounts_enabled
+    - ansible_facts['system'] == 'Linux'

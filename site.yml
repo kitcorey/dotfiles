@@ -5,5 +5,20 @@
     dotfiles_repo: "{{ lookup('env', 'PWD') }}"
     user_home: "{{ lookup('env', 'HOME') }}"
     install_rvm: false
+  pre_tasks:
+    # Host-local vars (uncommitted). Used to populate things like `nfs_mounts`
+    # with LAN-only details (server hostname, share paths) that shouldn't live
+    # in the repo. Missing file is fine — the playbook is a superset across
+    # all machines. Using stat + `when` (not `ignore_errors`) so a malformed
+    # local.yml still fails loudly instead of silently reverting to defaults.
+    - name: Check if host-local vars file exists
+      stat:
+        path: "{{ user_home }}/.config/dotfiles/local.yml"
+      register: local_vars_file
+    - name: Load host-local vars if present
+      include_vars:
+        file: "{{ user_home }}/.config/dotfiles/local.yml"
+      when: local_vars_file.stat.exists
   roles:
     - dotfiles
+    - nfs_mounts

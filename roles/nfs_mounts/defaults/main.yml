@@ -1,0 +1,11 @@
+# Default: no mounts configured. Hosts opt in by defining `nfs_mounts` in a
+# local (uncommitted) vars file — see site.yml for where that is loaded from.
+nfs_mounts: []
+
+# Defaults for each mount. Individual entries in `nfs_mounts` can override.
+# soft + noauto + x-systemd.automount: lazy on-access mount with bounded
+# retry, safe for laptops that are often off-LAN. nolock avoids needing
+# rpc.statd. Leaving fstype as plain "nfs" lets the kernel negotiate the
+# version with the server.
+nfs_mount_default_opts: "soft,noatime,nolock,rw,noauto,x-systemd.automount,x-systemd.mount-timeout=30,_netdev"
+nfs_mount_default_fstype: "nfs"
