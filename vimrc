@@ -25,7 +25,6 @@ if !has('nvim')
       Plug 'chazy/cscope_maps'
       Plug 'tpope/vim-abolish'
       Plug 'chrisbra/csv.vim'
-      Plug 'andymass/vim-matchup'
       Plug 'elzr/vim-json'
       Plug 'vim-scripts/repmo.vim'
       Plug 'PProvost/vim-ps1'

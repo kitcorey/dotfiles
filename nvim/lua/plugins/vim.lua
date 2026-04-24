@@ -11,7 +11,6 @@ return {
     {'chazy/cscope_maps'},
     {'tpope/vim-abolish'},
     {'chrisbra/csv.vim'},
-    {'andymass/vim-matchup'},
     {'elzr/vim-json'},
     {'vim-scripts/repmo.vim'},
     {'PProvost/vim-ps1'},
