@@ -31,15 +31,42 @@ return {
         end
     },
     {
-        "nvim-treesitter/nvim-treesitter-context",
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        lazy = false,
+        build = ":TSUpdate",
         config = function()
-            require('treesitter-context').setup {
-                max_lines = 5
-            }
+            local parsers = { "python", "ruby", "yaml", "go" }
+            local install_dir = vim.fn.stdpath("data") .. "/site"
+
+            -- lazy.nvim resets the default runtimepath, so the install dir
+            -- (where install() drops parser/*.so and queries/) is not picked
+            -- up automatically. Prepend it before setup() so :checkhealth and
+            -- vim.treesitter.language.add() can find installed parsers.
+            vim.opt.rtp:prepend(install_dir)
+
+            require("nvim-treesitter").setup({ install_dir = install_dir })
+            require("nvim-treesitter").install(parsers)
+
+            vim.api.nvim_create_autocmd("FileType", {
+                group = vim.api.nvim_create_augroup("UserTSStart", { clear = true }),
+                pattern = parsers,
+                callback = function(ev)
+                    local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
+                    if lang and pcall(vim.treesitter.language.add, lang) then
+                        vim.treesitter.start(ev.buf, lang)
+                    end
+                end,
+            })
         end,
-        requires = {
-            {"nvim-treesitter/nvim-treesitter"}
-        }
+    },
+    {
+        "nvim-treesitter/nvim-treesitter-context",
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
+        event = "VeryLazy",
+        config = function()
+            require("treesitter-context").setup({ max_lines = 5 })
+        end,
     },
     {
         "lukas-reineke/indent-blankline.nvim",
@@ -49,30 +76,8 @@ return {
         opts = {}
     },
     {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-        config = function(_, opts)
-            local configs = require("nvim-treesitter.configs")
-
-            configs.setup({
-                highlight = { enable = true },
-                disable = {},
-                -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-                -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-                -- Using this option may slow down your editor, and you may see some duplicate highlights.
-                -- Instead of true it can also be a list of languages
-                additional_vim_regex_highlighting = false,
-                sync_install = false,
-                ensure_installed = { "python", "ruby", "yaml", "go" }
-                })
-        end
-    },
-    {
         "ThePrimeagen/refactoring.nvim",
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "nvim-treesitter/nvim-treesitter",
-        },
+        dependencies = { "lewis6991/async.nvim" },
         lazy = false,
         config = function()
             require("refactoring").setup()

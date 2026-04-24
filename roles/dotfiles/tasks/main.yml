@@ -308,6 +308,21 @@
   args:
     creates: "{{ user_home }}/.local/bin/zoxide"
 
+# nvim-treesitter's main branch builds parsers from source via the tree-sitter
+# CLI. Apt's version is too old (0.22 on 25.10; main requires >=0.26.1) and
+# the cargo install pulls rquickjs-sys, which fails to bindgen against libclang
+# on Ubuntu 25.10. Upstream prebuilt binary is the reliable path.
+- name: Install tree-sitter CLI (Linux, prebuilt binary)
+  shell: |
+    set -euo pipefail
+    mkdir -p "{{ user_home }}/.local/bin"
+    curl -fsSL https://github.com/tree-sitter/tree-sitter/releases/download/v0.26.8/tree-sitter-linux-x64.gz \
+      | gunzip > "{{ user_home }}/.local/bin/tree-sitter"
+    chmod +x "{{ user_home }}/.local/bin/tree-sitter"
+  args:
+    creates: "{{ user_home }}/.local/bin/tree-sitter"
+  when: ansible_facts['system'] == 'Linux'
+
 
 - name: Install rust (if not present)
   shell: |
