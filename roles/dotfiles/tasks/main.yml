@@ -66,6 +66,7 @@
       - starship
       - aichat
       - 1password-cli
+      - bitwarden-cli
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -78,6 +79,7 @@
       - gpg
       - python3-pip
       - python3-venv
+      - unzip
     state: present
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
@@ -119,6 +121,7 @@
       - neovim
       - fzf
       - ripgrep
+      - unzip
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
   become: true
@@ -321,6 +324,19 @@
     chmod +x "{{ user_home }}/.local/bin/tree-sitter"
   args:
     creates: "{{ user_home }}/.local/bin/tree-sitter"
+  when: ansible_facts['system'] == 'Linux'
+
+- name: Install Bitwarden CLI (Linux, official zip)
+  shell: |
+    set -euo pipefail
+    mkdir -p "{{ user_home }}/.local/bin"
+    tmp="$(mktemp -d)"
+    curl -fsSL "https://vault.bitwarden.com/download/?app=cli&platform=linux" -o "$tmp/bw.zip"
+    unzip -o "$tmp/bw.zip" -d "$tmp"
+    install -m 0755 "$tmp/bw" "{{ user_home }}/.local/bin/bw"
+    rm -rf "$tmp"
+  args:
+    creates: "{{ user_home }}/.local/bin/bw"
   when: ansible_facts['system'] == 'Linux'
 
 
