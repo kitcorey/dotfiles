@@ -1,0 +1,7 @@
+- name: Update CA trust (Debian)
+  command: update-ca-certificates
+  become: true
+
+- name: Update CA trust (RedHat)
+  command: update-ca-trust extract
+  become: true

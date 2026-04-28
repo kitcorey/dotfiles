@@ -101,6 +101,45 @@
   when: ansible_facts['os_family'] == 'RedHat'
   become: true
 
+# Install the homelab internal CA root cert. The cert itself is the public
+# part (no private key) and is safe to commit. NODE_EXTRA_CA_CERTS in zshrc
+# points at the user-readable copy, so Node-based tools (Claude Code MCP,
+# etc.) trust internal services without depending on step-ca being checked
+# out on this host.
+- name: Ensure ~/.local/share exists
+  file:
+    path: "{{ user_home }}/.local/share"
+    state: directory
+    mode: '0755'
+
+- name: Install internal CA cert (user-readable, for NODE_EXTRA_CA_CERTS)
+  copy:
+    src: internal-ca.crt
+    dest: "{{ user_home }}/.local/share/internal-ca.crt"
+    mode: '0644'
+
+- name: Install internal CA cert into system trust (Debian/Ubuntu)
+  copy:
+    src: internal-ca.crt
+    dest: /usr/local/share/ca-certificates/internal-ca.crt
+    mode: '0644'
+    owner: root
+    group: root
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+  notify: Update CA trust (Debian)
+
+- name: Install internal CA cert into system trust (RedHat)
+  copy:
+    src: internal-ca.crt
+    dest: /etc/pki/ca-trust/source/anchors/internal-ca.crt
+    mode: '0644'
+    owner: root
+    group: root
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+  notify: Update CA trust (RedHat)
+
 - name: Ensure ~/.vim/autoload directory exists
   file:
     path: "{{ user_home }}/.vim/autoload"
