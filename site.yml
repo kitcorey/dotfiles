@@ -2,7 +2,7 @@
 - hosts: localhost
   gather_facts: true
   vars:
-    dotfiles_repo: "{{ lookup('env', 'PWD') }}"
+    dotfiles_repo: "{{ playbook_dir }}"
     user_home: "{{ lookup('env', 'HOME') }}"
     install_rvm: false
   pre_tasks:
