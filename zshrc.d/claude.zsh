@@ -7,7 +7,7 @@
 #
 # Bypass with: CLAUDE_NO_SANDBOX=1 claude ...
 # Inspect live:  systemctl --user status     (look for run-*.scope)
-claude() {
+_claude_run() {
   local claude_bin
   claude_bin=$(whence -p claude) || { print -u2 "claude: not found in PATH"; return 127 }
 
@@ -29,3 +29,6 @@ claude() {
     -p CPUQuota=150% \
     "$claude_bin" "$@"
 }
+
+claude() { _claude_run "$@" }
+opus46() { _claude_run --model claude-opus-4-6-20251015 "$@" }
