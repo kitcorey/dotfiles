@@ -66,6 +66,8 @@
       - starship
       - aichat
       - bitwarden-cli
+      - gh
+      - gitleaks
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -328,6 +330,80 @@
   args:
     creates: "{{ user_home }}/.local/bin/bw"
   when: ansible_facts['system'] == 'Linux'
+
+- name: Install gitleaks (Linux, GitHub release)
+  shell: |
+    set -euo pipefail
+    mkdir -p "{{ user_home }}/.local/bin"
+    tmp="$(mktemp -d)"
+    arch="{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}"
+    sha="{{ 'e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080' if ansible_facts['architecture'] == 'aarch64' else '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb' }}"
+    curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_${arch}.tar.gz" \
+      -o "$tmp/gitleaks.tar.gz"
+    echo "${sha}  $tmp/gitleaks.tar.gz" | sha256sum -c -
+    tar -xzf "$tmp/gitleaks.tar.gz" -C "$tmp" gitleaks
+    install -m 0755 "$tmp/gitleaks" "{{ user_home }}/.local/bin/gitleaks"
+    rm -rf "$tmp"
+  args:
+    creates: "{{ user_home }}/.local/bin/gitleaks"
+  when: ansible_facts['system'] == 'Linux'
+
+# Install gh from GitHub's official package repos so it tracks upstream
+# releases — distro-packaged gh lags significantly behind.
+- name: Ensure /etc/apt/keyrings exists (Debian)
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Install GitHub CLI apt keyring (Debian)
+  get_url:
+    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: '0644'
+    owner: root
+    group: root
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Add GitHub CLI apt repository (Debian)
+  apt_repository:
+    repo: >-
+      deb [arch={{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}
+      signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg]
+      https://cli.github.com/packages stable main
+    filename: github-cli
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Install GitHub CLI (Debian)
+  apt:
+    name: gh
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Add GitHub CLI yum repository (RedHat)
+  yum_repository:
+    name: gh-cli
+    description: GitHub CLI
+    baseurl: https://cli.github.com/packages/rpm
+    gpgcheck: yes
+    gpgkey: https://cli.github.com/packages/rpm/gpg.key
+    enabled: yes
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Install GitHub CLI (RedHat)
+  yum:
+    name: gh
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
 
 
 - name: Install rust (if not present)
