@@ -18,5 +18,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # from the OS trust store, but Node has its own bundle and needs this var.
 export NODE_EXTRA_CA_CERTS="$HOME/.local/share/internal-ca.crt"
 
-# Starting the starship prompt should be done last
+# Prompt and shims — both register precmd hooks, order between them doesn't matter
 eval "$(starship init zsh)"
+command -v mise >/dev/null && eval "$(mise activate zsh)"

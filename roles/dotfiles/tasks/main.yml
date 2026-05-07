@@ -68,6 +68,7 @@
       - bitwarden-cli
       - gh
       - gitleaks
+      - mise
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -348,8 +349,7 @@
     creates: "{{ user_home }}/.local/bin/gitleaks"
   when: ansible_facts['system'] == 'Linux'
 
-# Install gh from GitHub's official package repos so it tracks upstream
-# releases — distro-packaged gh lags significantly behind.
+# Shared apt keyring directory for third-party repos (gh, mise, ...).
 - name: Ensure /etc/apt/keyrings exists (Debian)
   file:
     path: /etc/apt/keyrings
@@ -358,6 +358,8 @@
   when: ansible_facts['os_family'] == 'Debian'
   become: true
 
+# Install gh from GitHub's official package repos so it tracks upstream
+# releases — distro-packaged gh lags significantly behind.
 - name: Install GitHub CLI apt keyring (Debian)
   get_url:
     url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
@@ -387,6 +389,35 @@
   when: ansible_facts['os_family'] == 'Debian'
   become: true
 
+- name: Install mise apt keyring (Debian)
+  get_url:
+    url: https://mise.jdx.dev/gpg-key.pub
+    dest: /etc/apt/keyrings/mise-archive-keyring.asc
+    mode: '0644'
+    owner: root
+    group: root
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Add mise apt repository (Debian)
+  apt_repository:
+    repo: >-
+      deb [arch={{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}
+      signed-by=/etc/apt/keyrings/mise-archive-keyring.asc]
+      https://mise.jdx.dev/deb stable main
+    filename: mise
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+- name: Install mise (Debian)
+  apt:
+    name: mise
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
 - name: Add GitHub CLI yum repository (RedHat)
   yum_repository:
     name: gh-cli
@@ -401,6 +432,24 @@
 - name: Install GitHub CLI (RedHat)
   yum:
     name: gh
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Add mise yum repository (RedHat)
+  yum_repository:
+    name: mise
+    description: mise
+    baseurl: https://mise.jdx.dev/rpm
+    gpgcheck: yes
+    gpgkey: https://mise.jdx.dev/gpg-key.pub
+    enabled: yes
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+
+- name: Install mise (RedHat)
+  yum:
+    name: mise
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
   become: true
