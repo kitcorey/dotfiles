@@ -143,6 +143,43 @@
   become: true
   notify: Update CA trust (RedHat)
 
+- name: Set internal CA fingerprints (macOS)
+  set_fact:
+    internal_ca_fingerprint: "DC78AE4E8AED36E3CABC8C4486EE090196B0E470"
+    internal_ca_retired_fingerprints:
+      - "7616E9B785B40BFC1BC96ADB3C753E9896E3153B"  # rotated out 2026-05-08
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- name: Check whether internal CA is in macOS System keychain
+  command: >
+    security find-certificate -a -Z /Library/Keychains/System.keychain
+  register: macos_keychain_dump
+  changed_when: false
+  failed_when: false
+  when: ansible_facts['os_family'] == 'Darwin'
+
+# macOS 11+ will prompt for admin auth (GUI) on the add/delete. Unavoidable
+# from CLI; silent install requires an MDM configuration profile.
+- name: Add internal CA to macOS System keychain as trusted root
+  command: >
+    security add-trusted-cert -d -r trustRoot
+    -k /Library/Keychains/System.keychain
+    {{ user_home }}/.local/share/internal-ca.crt
+  become: true
+  when:
+    - ansible_facts['os_family'] == 'Darwin'
+    - internal_ca_fingerprint not in macos_keychain_dump.stdout | default('')
+
+- name: Remove retired internal CA fingerprints from macOS System keychain
+  command: >
+    security delete-certificate -Z {{ item }}
+    /Library/Keychains/System.keychain
+  become: true
+  loop: "{{ internal_ca_retired_fingerprints | default([]) }}"
+  when:
+    - ansible_facts['os_family'] == 'Darwin'
+    - item in macos_keychain_dump.stdout | default('')
+
 - name: Ensure ~/.vim/autoload directory exists
   file:
     path: "{{ user_home }}/.vim/autoload"
