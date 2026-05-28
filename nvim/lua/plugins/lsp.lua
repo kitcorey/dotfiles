@@ -36,7 +36,7 @@ return {
         lazy = false,
         build = ":TSUpdate",
         config = function()
-            local parsers = { "python", "ruby", "yaml", "go" }
+            local parsers = { "python", "ruby", "yaml", "go", "markdown", "markdown_inline" }
             local install_dir = vim.fn.stdpath("data") .. "/site"
 
             -- lazy.nvim resets the default runtimepath, so the install dir
