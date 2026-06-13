@@ -11,6 +11,13 @@
     # land on the system python — so a hard pin would be wrong for one of them.
     # auto_silent keeps that per-context discovery and just suppresses the note.
     ansible_python_interpreter: auto_silent
+  # Disable hk git hooks during provisioning. The symlinked ~/.gitconfig
+  # registers config-based hooks (post-checkout, etc.) that run `mise x -- hk`,
+  # but `hk` isn't installed until the `mise install` task -- so any git clone/
+  # checkout before then would fail when the hook can't exec hk. HK=0 is the
+  # hooks' own opt-out; tools still get hk installed for normal interactive use.
+  environment:
+    HK: "0"
   pre_tasks:
     # Host-local vars (uncommitted). Used to populate things like `nfs_mounts`
     # with LAN-only details (server hostname, share paths) that shouldn't live
