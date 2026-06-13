@@ -1,3 +1,9 @@
+export PATH=/opt/homebrew/bin:$PATH
+# Ensure Homebrew env is set up before zshrc.d/* (some shells skip ~/.zprofile).
+# Guards: only on hosts where brew exists, and skip if .zprofile already ran.
+[[ -x /opt/homebrew/bin/brew ]] && [[ ":$PATH:" != *":/opt/homebrew/bin:"* ]] && \
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # Load all files from .shell/zshrc.d directory
 if [ -d $HOME/.shellrc/zshrc.d ]; then
   for file in $HOME/.shellrc/zshrc.d/*.zsh(N); do
@@ -18,6 +24,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # from the OS trust store, but Node has its own bundle and needs this var.
 export NODE_EXTRA_CA_CERTS="$HOME/.local/share/internal-ca.crt"
 
-# Prompt and shims — both register precmd hooks, order between them doesn't matter
-eval "$(starship init zsh)"
+# Shims first, then prompt — starship init must come last so its precmd hook runs after mise's.
 command -v mise >/dev/null && eval "$(mise activate zsh)"
+eval "$(starship init zsh)"
