@@ -1,0 +1,10 @@
+[tools]
+hk = "1.45.0"
+node = "24.16.0"
+python = "3.14.4"
+"npm:typescript" = "latest"
+"npm:typescript-language-server" = "latest"
+starship = "latest"
+ripgrep = "latest"
+zoxide = "latest"
+aichat = "latest"

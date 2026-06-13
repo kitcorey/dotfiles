@@ -55,16 +55,11 @@
     name:
       - git
       - tmux
-      - zoxide
-      - ripgrep
       - pyenv
       - neovim
       - fzf
       - curl
       - gpg
-      - rust
-      - starship
-      - aichat
       - bitwarden-cli
       - gh
       - gitleaks
@@ -98,7 +93,6 @@
       - python3-venv
       - neovim
       - fzf
-      - ripgrep
       - unzip
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
@@ -306,6 +300,13 @@
     state: link
     force: true
 
+- name: Symlink .zshenv
+  file:
+    src: "{{ dotfiles_repo }}/zshenv"
+    dest: "{{ user_home }}/.zshenv"
+    state: link
+    force: true
+
 - name: Symlink .gitconfig
   file:
     src: "{{ dotfiles_repo }}/gitconfig"
@@ -334,12 +335,6 @@
   args:
     chdir: "{{ user_home }}/.fzf"
     creates: "{{ user_home }}/.fzf.bash"
-
-- name: Install zoxide (if not present)
-  shell: |
-    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-  args:
-    creates: "{{ user_home }}/.local/bin/zoxide"
 
 # nvim-treesitter's main branch builds parsers from source via the tree-sitter
 # CLI. Apt's version is too old (0.22 on 25.10; main requires >=0.26.1) and
@@ -492,15 +487,30 @@
   become: true
 
 
-- name: Install rust (if not present)
-  shell: |
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
-  args:
-    creates: "{{ user_home }}/.cargo/bin/cargo"
+- name: Ensure ~/.config/mise exists
+  file:
+    path: "{{ user_home }}/.config/mise"
+    state: directory
+    mode: '0755'
 
-- name: Update rust toolchain
-  shell: "{{ user_home }}/.cargo/bin/rustup update stable"
-  changed_when: false
+- name: Symlink mise config
+  file:
+    src: "{{ dotfiles_repo }}/mise-config.toml"
+    dest: "{{ user_home }}/.config/mise/config.toml"
+    state: link
+    force: true
+
+# `mise activate` only sets up PATH/shims; it does not install missing tools.
+# Install everything declared in the global config so the tools that moved off
+# cargo/brew (starship, ripgrep, zoxide, aichat, ...) actually exist — notably
+# starship, whose `starship init` runs unconditionally at shell startup.
+- name: Install mise-managed tools
+  command: mise install --yes
+  environment:
+    PATH: "/opt/homebrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
+  register: mise_install
+  changed_when: "'Installing' in mise_install.stdout or 'Installing' in mise_install.stderr"
+
 
 - name: Ensure ~/.local/bin is in PATH in .zshrc
   lineinfile:
@@ -509,18 +519,6 @@
     line: 'export PATH="$HOME/.local/bin:$PATH"'
     insertafter: EOF
     state: present
-
-- name: Install required rust packages (if not present)
-  community.general.cargo:
-    name:
-      - starship
-      - ripgrep
-      - zoxide
-      - aichat
-  environment:
-    PATH: "{{ user_home }}/.cargo/bin:{{ ansible_env.PATH }}"
-  when:
-    - ansible_facts['system'] == 'Linux'
 
 - name: Symlink starship.toml
   file:
