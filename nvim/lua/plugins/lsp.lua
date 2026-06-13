@@ -27,6 +27,22 @@ return {
             vim.lsp.config("rubocop", {})
             vim.lsp.config("rubocop", {})
             vim.lsp.config("gopls", {})
+            -- ts_ls (typescript-language-server) and typescript are installed
+            -- as separate mise npm tools, so the server can't find tsserver as
+            -- a sibling. Point it at the active global typescript lib instead.
+            -- Resolved via `mise where` so it survives version bumps; a project
+            -- with its own node_modules/typescript still takes precedence.
+            local ts_ls_opts = {}
+            if vim.fn.executable("mise") == 1 then
+                local ts = vim.fn.trim(vim.fn.system({ "mise", "where", "npm:typescript" }))
+                if vim.v.shell_error == 0 and ts ~= "" then
+                    ts_ls_opts.init_options = {
+                        tsserver = { path = ts .. "/lib/node_modules/typescript/lib" },
+                    }
+                end
+            end
+            vim.lsp.config("ts_ls", ts_ls_opts)
+            vim.lsp.enable("ts_ls")
             -- vim.lsp.config("solargraph", {})
         end
     },
@@ -36,7 +52,13 @@ return {
         lazy = false,
         build = ":TSUpdate",
         config = function()
-            local parsers = { "python", "ruby", "yaml", "go", "markdown", "markdown_inline" }
+            local parsers = { "python", "ruby", "yaml", "go", "markdown", "markdown_inline",
+                "typescript", "tsx", "javascript" }
+            -- Filetypes to start highlighting on. Kept separate from `parsers`
+            -- because parser names don't always equal filetypes: the `tsx`
+            -- parser backs `typescriptreact`, and `.jsx` is `javascriptreact`.
+            local filetypes = { "python", "ruby", "yaml", "go", "markdown",
+                "typescript", "typescriptreact", "javascript", "javascriptreact" }
             local install_dir = vim.fn.stdpath("data") .. "/site"
 
             -- lazy.nvim resets the default runtimepath, so the install dir
@@ -50,7 +72,7 @@ return {
 
             vim.api.nvim_create_autocmd("FileType", {
                 group = vim.api.nvim_create_augroup("UserTSStart", { clear = true }),
-                pattern = parsers,
+                pattern = filetypes,
                 callback = function(ev)
                     local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
                     if lang and pcall(vim.treesitter.language.add, lang) then
