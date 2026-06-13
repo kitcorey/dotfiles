@@ -5,6 +5,12 @@
     dotfiles_repo: "{{ playbook_dir }}"
     user_home: "{{ lookup('env', 'HOME') }}"
     install_rvm: false
+    # Accept ansible's auto-discovered interpreter without the warning. We run
+    # against localhost only: unprivileged tasks use whatever python is on PATH
+    # (often the mise-managed one), while `become` tasks re-discover as root and
+    # land on the system python — so a hard pin would be wrong for one of them.
+    # auto_silent keeps that per-context discovery and just suppresses the note.
+    ansible_python_interpreter: auto_silent
   pre_tasks:
     # Host-local vars (uncommitted). Used to populate things like `nfs_mounts`
     # with LAN-only details (server hostname, share paths) that shouldn't live

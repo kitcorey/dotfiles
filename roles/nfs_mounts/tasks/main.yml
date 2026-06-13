@@ -48,6 +48,10 @@
     fstype: "{{ item.fstype | default(nfs_mount_default_fstype) }}"
     opts: "{{ item.opts | default(nfs_mount_default_opts) }}"
     state: "{{ item.state | default('mounted') }}"
+    # Our default opts use noauto + x-systemd.automount (lazy on-access mount),
+    # so mounting at boot is intentionally off. Setting boot explicitly keeps
+    # it consistent with opts and silences the module's "ignoring boot" warning.
+    boot: false
   become: true
   loop: "{{ nfs_mounts | default([], true) }}"
   when:
