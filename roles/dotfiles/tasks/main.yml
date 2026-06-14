@@ -65,6 +65,7 @@
       - gitleaks
       - mise
       - tree-sitter-cli
+      - ykman
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
