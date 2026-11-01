@@ -17,6 +17,8 @@
 	difftool = true
 [alias]
 	dft = difftool
+	# Renamed stash moves to stash@{0}: git can only drop and re-store an entry.
+	stash-rename = "!f() {\n  [ $# -eq 2 ] && [ -n \"$2\" ] || { echo \"usage: git stash-rename <index> <message>\" >&2; return 1; }\n  case $1 in ''|*[!0-9]*) echo \"bad stash index: $1\" >&2; return 1;; esac\n  rev=$(git rev-parse --verify -q \"stash@{$1}\") || { echo \"no stash@{$1}\" >&2; return 1; }\n  git stash drop -q \"stash@{$1}\" && git stash store -m \"$2\" \"$rev\" || { echo \"stash-rename failed; commit is $rev\" >&2; return 1; }\n}; f"
 [init]
 	defaultBranch = main
 [hook "hk-commit-msg"]
