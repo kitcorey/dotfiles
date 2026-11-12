@@ -55,7 +55,6 @@
     name:
       - git
       - tmux
-      - pyenv
       - neovim
       - fzf
       - curl
@@ -233,20 +232,6 @@
     dest: "{{ user_home }}/.config/nvim/lua"
     state: link
     force: true
-
-- name: Clone pyenv
-  git:
-    repo: https://github.com/pyenv/pyenv.git
-    dest: "{{ user_home }}/.pyenv"
-    update: yes
-  when: ansible_facts['system'] == 'Linux'
-
-- name: Clone pyenv-virtualenv
-  git:
-    repo: https://github.com/pyenv/pyenv-virtualenv.git
-    dest: "{{ user_home }}/.pyenv/plugins/pyenv-virtualenv"
-    update: yes
-  when: ansible_facts['system'] == 'Linux'
 
 - name: Clone tmux plugin manager
   git:
