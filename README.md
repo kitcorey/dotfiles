@@ -5,15 +5,26 @@ Personal configuration files for a consistent dev environment across machines.
 ## Prerequisites
 
 ```bash
-pip install ansible
-ansible-galaxy collection install community.general
+./bootstrap-ansible.sh
 ```
+
+This installs Ansible via apt/dnf (Linux) or Homebrew (macOS).
 
 ## Usage
 
 ```bash
 ansible-playbook site.yml --ask-become-pass
 ```
+
+On Ubuntu 25.10+, Ansible's become doesn't work with the default `sudo-rs`
+([ansible#85837](https://github.com/ansible/ansible/issues/85837)); use the
+classic sudo instead:
+
+```bash
+ANSIBLE_BECOME_EXE=sudo.ws ansible-playbook site.yml --ask-become-pass
+```
+
+Add `--check --diff` for a dry run.
 
 To also install RVM:
 
@@ -25,23 +36,24 @@ ansible-playbook site.yml --ask-become-pass -e install_rvm=true
 
 - **Neovim** — latest AppImage (Linux) or via Homebrew (macOS)
 - **zsh** — set as default shell (Linux)
-- **starship** — prompt, built from source via cargo (Linux) or Homebrew (macOS)
-- **zoxide**, **ripgrep**, **fzf** — modern shell utilities
-- **pyenv** + **pyenv-virtualenv** — Python version management
+- **mise** — tool version manager (apt/dnf on Linux, Homebrew on macOS). Installs
+  the tools in `mise-config.toml`: starship, ripgrep, zoxide, aichat, hk, go,
+  node, python and the TypeScript LSP
+- **gh**, **gitleaks**, **Bitwarden CLI**, **tree-sitter CLI**
+- **fzf** — fuzzy finder, cloned to `~/.fzf`
 - **tmux** + tpm (plugin manager)
-- **Rust** / cargo — via rustup (Linux) or Homebrew (macOS)
 - **vim-plug** — Vim plugin manager
-- **aichat** — AI CLI chat tool, via Homebrew (macOS) or cargo (Linux)
+- **Internal CA** — homelab CA cert added to system trust
 
 ## Dotfiles managed
 
 Symlinks created in `$HOME`:
 
-- `.zshrc`, `.shellrc/zshrc.d`, `.shellrc/bashrc.d`
+- `.zshrc`, `.zshenv`, `.shellrc/zshrc.d`, `.shellrc/bashrc.d`
 - `.vimrc`, `.config/nvim/init.vim`, `.config/nvim/lua`
 - `.tmux.conf`
 - `.gitconfig`, `.gitignore`
-- `.config/starship.toml`
+- `.config/starship.toml`, `.config/mise/config.toml`
 - `<user-config-dir>/aichat`
 
 Copied (not symlinked): `.cshrc`, `.inputrc`, `.config/flake8`
