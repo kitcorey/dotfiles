@@ -318,12 +318,16 @@
   when:
     - ansible_facts['system'] == 'Linux'
 
-- name: Install fzf key bindings and completion
+# Re-run the installer whenever the clone updates: it downloads the fzf binary
+# matching the checkout. Otherwise a fresh shell/key-bindings.zsh ends up paired
+# with an old binary that rejects its newer options, and Ctrl-R silently fails.
+# (`is exists` checks the controller, which is this machine — site.yml is local.)
+- name: Install fzf binary, key bindings and completion
   shell: |
     {{ user_home }}/.fzf/install --key-bindings --completion --no-update-rc
   args:
     chdir: "{{ user_home }}/.fzf"
-    creates: "{{ user_home }}/.fzf.bash"
+  when: fzf_clone is changed or not (user_home + '/.fzf.bash') is exists
 
 # nvim-treesitter's main branch builds parsers from source via the tree-sitter
 # CLI. Apt's version is too old (0.22 on 25.10; main requires >=0.26.1) and
@@ -366,6 +370,7 @@
     tar -xzf "$tmp/gitleaks.tar.gz" -C "$tmp" gitleaks
     install -m 0755 "$tmp/gitleaks" "{{ user_home }}/.local/bin/gitleaks"
     rm -rf "$tmp"
+  register: fzf_clone
   args:
     creates: "{{ user_home }}/.local/bin/gitleaks"
   when: ansible_facts['system'] == 'Linux'
