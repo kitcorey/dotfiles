@@ -385,6 +385,8 @@
   get_url:
     url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
     dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    # Re-fetch every run so rotated (or truncated) keys get replaced.
+    force: true
     mode: '0644'
     owner: root
     group: root
@@ -402,18 +404,35 @@
   when: ansible_facts['os_family'] == 'Debian'
   become: true
 
+# Ubuntu Pro's ESM repo pins its (older) gh at priority 510, which beats any
+# other repo's default 500 regardless of version. Pin GitHub's repo higher.
+- name: Prefer GitHub CLI from GitHub's repo (Debian)
+  copy:
+    dest: /etc/apt/preferences.d/github-cli
+    content: |
+      Package: gh
+      Pin: origin cli.github.com
+      Pin-Priority: 600
+    mode: '0644'
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
 - name: Install GitHub CLI (Debian)
   apt:
     name: gh
-    state: present
+    state: latest
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
   become: true
+  # Depends on a dir/repo created by a previous task, which --check doesn't do.
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install mise apt keyring (Debian)
   get_url:
     url: https://mise.jdx.dev/gpg-key.pub
     dest: /etc/apt/keyrings/mise-archive-keyring.asc
+    # Re-fetch every run so rotated (or truncated) keys get replaced.
+    force: true
     mode: '0644'
     owner: root
     group: root
@@ -424,8 +443,6 @@
   apt_repository:
     repo: >-
       deb [arch={{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}
-  # Depends on a dir/repo created by a previous task, which --check doesn't do.
-  ignore_errors: "{{ ansible_check_mode }}"
       signed-by=/etc/apt/keyrings/mise-archive-keyring.asc]
       https://mise.jdx.dev/deb stable main
     filename: mise
@@ -440,6 +457,8 @@
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
   become: true
+  # Depends on a dir/repo created by a previous task, which --check doesn't do.
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Add GitHub CLI yum repository (RedHat)
   yum_repository:
@@ -457,8 +476,6 @@
     name: gh
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
-  # Depends on a dir/repo created by a previous task, which --check doesn't do.
-  ignore_errors: "{{ ansible_check_mode }}"
   become: true
 
 - name: Add mise yum repository (RedHat)
