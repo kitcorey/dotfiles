@@ -83,6 +83,55 @@
   when: ansible_facts['os_family'] == 'Debian'
   become: true
 
+# Shared apt keyring directory for third-party repos (git-core PPA, gh, mise).
+- name: Ensure /etc/apt/keyrings exists (Debian)
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+
+# The hk hooks in gitconfig are config-based (hook.<name>.command/event), which
+# git only supports from 2.54. Ubuntu's archive git lags behind (26.04 ships
+# 2.53), so older git silently skips every hook. The git-core PPA tracks
+# upstream stable releases.
+#
+# Fetch the PPA key over HTTPS ourselves: apt_repository's `ppa:` shorthand
+# shells out to gpg's keyserver fetch, which fails on this setup.
+- name: Install git-core PPA apt keyring (Ubuntu)
+  get_url:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0xF911AB184317630C59970973E363C90F8F1B6217
+    dest: /etc/apt/keyrings/git-core-ppa.asc
+    # Re-fetch every run so rotated (or truncated) keys get replaced.
+    force: true
+    mode: '0644'
+    owner: root
+    group: root
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  become: true
+
+- name: Add git-core PPA (Ubuntu)
+  apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/git-core-ppa.asc]
+      https://ppa.launchpadcontent.net/git-core/ppa/ubuntu
+      {{ ansible_facts['distribution_release'] }} main
+    filename: git-core-ppa
+    state: present
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  become: true
+
+- name: Install latest git from the git-core PPA (Ubuntu)
+  apt:
+    name: git
+    state: latest
+    update_cache: yes
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  become: true
+  # Depends on a dir/repo created by a previous task, which --check doesn't do.
+  ignore_errors: "{{ ansible_check_mode }}"
+
 - name: Install required packages (RedHat/CentOS)
   yum:
     name:
@@ -317,6 +366,7 @@
     update: yes
   when:
     - ansible_facts['system'] == 'Linux'
+  register: fzf_clone
 
 # Re-run the installer whenever the clone updates: it downloads the fzf binary
 # matching the checkout. Otherwise a fresh shell/key-bindings.zsh ends up paired
@@ -370,19 +420,9 @@
     tar -xzf "$tmp/gitleaks.tar.gz" -C "$tmp" gitleaks
     install -m 0755 "$tmp/gitleaks" "{{ user_home }}/.local/bin/gitleaks"
     rm -rf "$tmp"
-  register: fzf_clone
   args:
     creates: "{{ user_home }}/.local/bin/gitleaks"
   when: ansible_facts['system'] == 'Linux'
-
-# Shared apt keyring directory for third-party repos (gh, mise, ...).
-- name: Ensure /etc/apt/keyrings exists (Debian)
-  file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: '0755'
-  when: ansible_facts['os_family'] == 'Debian'
-  become: true
 
 # Install gh from GitHub's official package repos so it tracks upstream
 # releases — distro-packaged gh lags significantly behind.
