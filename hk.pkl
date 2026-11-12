@@ -1,0 +1,31 @@
+amends "package://github.com/jdx/hk/releases/download/v1.45.0/hk@1.45.0#/Config.pkl"
+
+// Secret scanning only. gitleaks is installed by the playbook (Homebrew on
+// macOS, GitHub release into ~/.local/bin on Linux).
+
+local gitleaksStaged: Step = new Step {
+  check = "mise exec -- gitleaks git --pre-commit --staged --redact --verbose"
+}
+
+local gitleaksHistory: Step = new Step {
+  check = "mise exec -- gitleaks git --redact --verbose"
+}
+
+hooks {
+  ["pre-commit"] {
+    stash = "git"
+    steps {
+      ["gitleaks-staged"] = gitleaksStaged
+    }
+  }
+  ["pre-push"] {
+    steps {
+      ["gitleaks-history"] = gitleaksHistory
+    }
+  }
+  ["check"] {
+    steps {
+      ["gitleaks-history"] = gitleaksHistory
+    }
+  }
+}
