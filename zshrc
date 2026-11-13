@@ -1,6 +1,3 @@
-# Must come first: over SSH this may exec a new login shell.
-[[ -r $HOME/.shellrc/zshrc.d/00-ssh-inhibit.zsh ]] && source $HOME/.shellrc/zshrc.d/00-ssh-inhibit.zsh
-
 export PATH=/opt/homebrew/bin:$PATH
 # Ensure Homebrew env is set up before zshrc.d/* (some shells skip ~/.zprofile).
 # Guards: only on hosts where brew exists, and skip if .zprofile already ran.
