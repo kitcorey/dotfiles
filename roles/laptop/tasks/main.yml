@@ -8,7 +8,7 @@
 - name: Allow inhibiting sleep from SSH sessions (polkit)
   template:
     src: 50-inhibit.rules.j2
-    dest: "/etc/polkit-1/rules.d/50-{{ ansible_user_id }}-inhibit.rules"
+    dest: "/etc/polkit-1/rules.d/50-{{ ansible_facts['user_id'] }}-inhibit.rules"
     owner: root
     group: root
     mode: '0644'
@@ -19,7 +19,7 @@
 
 - name: Remove SSH sleep inhibit polkit rule
   file:
-    path: "/etc/polkit-1/rules.d/50-{{ ansible_user_id }}-inhibit.rules"
+    path: "/etc/polkit-1/rules.d/50-{{ ansible_facts['user_id'] }}-inhibit.rules"
     state: absent
   become: true
   when:

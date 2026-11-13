@@ -1,6 +1,6 @@
-// Let {{ ansible_user_id }} hold sleep/idle/lid inhibitors from any session (e.g. SSH).
+// Let {{ ansible_facts['user_id'] }} hold sleep/idle/lid inhibitors from any session (e.g. SSH).
 polkit.addRule(function(action, subject) {
-    if (subject.user == "{{ ansible_user_id }}" &&
+    if (subject.user == "{{ ansible_facts['user_id'] }}" &&
         (action.id == "org.freedesktop.login1.inhibit-block-sleep" ||
          action.id == "org.freedesktop.login1.inhibit-block-idle" ||
          action.id == "org.freedesktop.login1.inhibit-handle-lid-switch")) {
