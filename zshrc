@@ -1,4 +1,3 @@
-export PATH=/opt/homebrew/bin:$PATH
 # Ensure Homebrew env is set up before zshrc.d/* (some shells skip ~/.zprofile).
 # Guards: only on hosts where brew exists, and skip if .zprofile already ran.
 [[ -x /opt/homebrew/bin/brew ]] && [[ ":$PATH:" != *":/opt/homebrew/bin:"* ]] && \
