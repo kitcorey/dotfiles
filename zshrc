@@ -13,8 +13,6 @@ fi
 # Use emacs keybindings
 bindkey -e
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
 # Ensure ~/.local/bin is in PATH for user-installed binaries
 export PATH="$HOME/.local/bin:$PATH"
 
