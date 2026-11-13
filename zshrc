@@ -1,12 +1,5 @@
-# Over SSH on Linux, block suspend (idle + lid) for the life of the session.
-# Needs the polkit rule from the ansible laptop role (ssh_sleep_inhibit). Probe
-# first: without the rule logind refuses the lock, and a failed exec here would
-# close the SSH session immediately.
-if [[ -n $SSH_CONNECTION && -z $SSH_INHIBITED ]] && (( $+commands[systemd-inhibit] )) \
-   && systemd-inhibit --no-ask-password --what=sleep:idle:handle-lid-switch --mode=block true &>/dev/null; then
-  export SSH_INHIBITED=1
-  exec systemd-inhibit --no-ask-password --what=sleep:idle:handle-lid-switch --why="SSH session" --mode=block zsh -l
-fi
+# Must come first: over SSH this may exec a new login shell.
+[[ -r $HOME/.shellrc/zshrc.d/00-ssh-inhibit.zsh ]] && source $HOME/.shellrc/zshrc.d/00-ssh-inhibit.zsh
 
 export PATH=/opt/homebrew/bin:$PATH
 # Ensure Homebrew env is set up before zshrc.d/* (some shells skip ~/.zprofile).
