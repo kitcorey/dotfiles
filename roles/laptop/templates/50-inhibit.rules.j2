@@ -1,12 +1,9 @@
-// Managed by ansible (dotfiles laptop role).
-// Let {{ ansible_user_id }} block sleep, idle and lid-switch handling from
-// any session, including SSH. logind's defaults only allow these for local
-// active sessions (block-sleep needs admin auth, lid-switch is denied).
+// Let {{ ansible_user_id }} hold sleep/idle/lid inhibitors from any session (e.g. SSH).
 polkit.addRule(function(action, subject) {
-    if ((action.id == "org.freedesktop.login1.inhibit-block-sleep" ||
+    if (subject.user == "{{ ansible_user_id }}" &&
+        (action.id == "org.freedesktop.login1.inhibit-block-sleep" ||
          action.id == "org.freedesktop.login1.inhibit-block-idle" ||
-         action.id == "org.freedesktop.login1.inhibit-handle-lid-switch") &&
-        subject.user == "{{ ansible_user_id }}") {
+         action.id == "org.freedesktop.login1.inhibit-handle-lid-switch")) {
         return polkit.Result.YES;
     }
 });
