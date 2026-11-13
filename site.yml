@@ -19,6 +19,17 @@
   environment:
     HK: "0"
   pre_tasks:
+    # Committed per-host profile, keyed by short hostname. Holds machine
+    # settings that are fine to publish (laptop power settings, udev rules) so
+    # they survive a reinstall. Loaded before local.yml, so local.yml wins.
+    - name: Check if a host profile exists
+      stat:
+        path: "{{ playbook_dir }}/host_profiles/{{ ansible_facts['hostname'] }}.yml"
+      register: host_profile_file
+    - name: Load host profile if present
+      include_vars:
+        file: "{{ playbook_dir }}/host_profiles/{{ ansible_facts['hostname'] }}.yml"
+      when: host_profile_file.stat.exists
     # Host-local vars (uncommitted). Used to populate things like `nfs_mounts`
     # with LAN-only details (server hostname, share paths) that shouldn't live
     # in the repo. Missing file is fine — the playbook is a superset across
@@ -35,3 +46,5 @@
   roles:
     - dotfiles
     - nfs_mounts
+    - laptop
+    - firebreak

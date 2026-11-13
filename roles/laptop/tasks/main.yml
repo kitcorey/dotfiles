@@ -1,0 +1,102 @@
+# Laptop-only system settings. Every block is opt-in; see defaults/main.yml.
+
+# --- SSH sleep inhibit -------------------------------------------------------
+# polkit picks up changes in rules.d on its own, so no handler is needed.
+- name: Allow inhibiting sleep from SSH sessions (polkit)
+  template:
+    src: 50-inhibit.rules.j2
+    dest: "/etc/polkit-1/rules.d/50-{{ ansible_user_id }}-inhibit.rules"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - ssh_sleep_inhibit | bool
+    - ansible_facts['system'] == 'Linux'
+
+# --- TLP ---------------------------------------------------------------------
+- name: Install TLP
+  package:
+    name: tlp
+    state: present
+  become: true
+  when:
+    - tlp_enabled | bool
+    - ansible_facts['system'] == 'Linux'
+  notify: Apply TLP settings
+
+- name: Enable and start TLP
+  systemd:
+    name: tlp
+    enabled: true
+    state: started
+  become: true
+  when:
+    - tlp_enabled | bool
+    - ansible_facts['system'] == 'Linux'
+
+- name: Configure TLP tp_smapi drop-in
+  copy:
+    content: "TPSMAPI_ENABLE=0\n"
+    dest: /etc/tlp.d/50-no-tpsmapi.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - tlp_enabled | bool
+    - not (tlp_tpsmapi_enable | bool)
+    - ansible_facts['system'] == 'Linux'
+  notify: Apply TLP settings
+
+- name: Remove TLP tp_smapi drop-in
+  file:
+    path: /etc/tlp.d/50-no-tpsmapi.conf
+    state: absent
+  become: true
+  when:
+    - tlp_enabled | bool
+    - tlp_tpsmapi_enable | bool
+    - ansible_facts['system'] == 'Linux'
+  notify: Apply TLP settings
+
+- name: Configure TLP battery charge thresholds
+  copy:
+    content: |
+      START_CHARGE_THRESH_{{ tlp_charge_thresholds.battery }}={{ tlp_charge_thresholds.start }}
+      STOP_CHARGE_THRESH_{{ tlp_charge_thresholds.battery }}={{ tlp_charge_thresholds.stop }}
+    dest: /etc/tlp.d/60-charge-thresholds.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - tlp_enabled | bool
+    - tlp_charge_thresholds | default({}, true) | length > 0
+    - ansible_facts['system'] == 'Linux'
+  notify: Apply TLP settings
+
+- name: Remove TLP battery charge thresholds
+  file:
+    path: /etc/tlp.d/60-charge-thresholds.conf
+    state: absent
+  become: true
+  when:
+    - tlp_enabled | bool
+    - tlp_charge_thresholds | default({}, true) | length == 0
+    - ansible_facts['system'] == 'Linux'
+  notify: Apply TLP settings
+
+# --- FL1100 ExpressCard ------------------------------------------------------
+- name: Keep FL1100 ExpressCard USB 3.0 controller awake (udev)
+  copy:
+    src: 99-fl1100-no-autosuspend.rules
+    dest: /etc/udev/rules.d/99-fl1100-no-autosuspend.rules
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - fl1100_no_autosuspend | bool
+    - ansible_facts['system'] == 'Linux'
+  notify: Reload udev rules

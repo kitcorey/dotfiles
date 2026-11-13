@@ -1,0 +1,7 @@
+# Fresco Logic FL1100 ExpressCard USB 3.0 (1b73:1100): its USB 3 root hub
+# fails to resume from runtime suspend (status=error, ports go dead).
+# Keep the controller and everything on it awake.
+# Named 99- to run after 60-autosuspend.rules; the RUN runs after TLP's
+# 85-tlp.rules RUN (RUN programs execute in rule order, after all rules).
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x1b73", ATTR{device}=="0x1100", ATTR{power/control}="on"
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{vendor}=="0x1b73", ATTRS{device}=="0x1100", TEST=="power/control", ATTR{power/control}="on", RUN+="/bin/sh -c 'echo on > /sys%p/power/control'"

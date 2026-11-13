@@ -1,0 +1,20 @@
+# Everything is off by default. Hosts opt in from host_profiles/<hostname>.yml
+# (committed) or ~/.config/dotfiles/local.yml (uncommitted); see site.yml.
+
+# Let this user take sleep/idle/lid-switch inhibitor locks from SSH sessions.
+# zshrc takes the lock on SSH login when it can; without this polkit rule,
+# logind only allows that for local (active) sessions.
+ssh_sleep_inhibit: false
+
+# Install and enable TLP. Ubuntu's tlp package conflicts with
+# power-profiles-daemon, so installing it removes that.
+tlp_enabled: false
+# false writes /etc/tlp.d/50-no-tpsmapi.conf with TPSMAPI_ENABLE=0.
+tlp_tpsmapi_enable: true
+# Empty means no thresholds are set. Example:
+#   tlp_charge_thresholds: { battery: BAT0, start: 75, stop: 80 }
+tlp_charge_thresholds: {}
+
+# Keep a Fresco Logic FL1100 ExpressCard USB 3.0 controller out of runtime
+# suspend; it fails to resume and its ports go dead.
+fl1100_no_autosuspend: false

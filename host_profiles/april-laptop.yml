@@ -1,0 +1,16 @@
+# ThinkPad X220. Loaded by site.yml when the hostname matches this file name.
+ssh_sleep_inhibit: true
+
+tlp_enabled: true
+# TLP's tp_smapi support is off on this machine.
+tlp_tpsmapi_enable: false
+tlp_charge_thresholds:
+  battery: BAT0
+  start: 75
+  stop: 80
+
+# Fresco Logic FL1100 ExpressCard USB 3.0 adapter.
+fl1100_no_autosuspend: true
+
+# Echo Dot udev rules.
+firebreak: true

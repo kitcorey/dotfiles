@@ -1,0 +1,9 @@
+- name: Apply TLP settings
+  command: tlp start
+  become: true
+
+# Reload only: the FL1100 rule matches ACTION=="add", so it takes effect on
+# the next boot or replug, not on devices that are already present.
+- name: Reload udev rules
+  command: udevadm control --reload
+  become: true
