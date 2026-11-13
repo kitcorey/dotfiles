@@ -1,7 +1,7 @@
 # Off by default. Hosts opt in from host_profiles/<hostname>.yml or
 # ~/.config/dotfiles/local.yml; see site.yml.
 #
-# Installs udev rules giving plugdev/the logged-in user raw USB and serial
-# access to Amazon Echo Dot devices and the MediaTek/Google/HTC USB modes
-# they enumerate in.
+# Installs 51-echo-dot.rules: plugdev and the logged-in user get raw USB and
+# serial access to devices with vendor IDs 1949 (Amazon), 18d1 (Google),
+# 0bb4 (HTC) and 0e8d (MediaTek), limited to specific product IDs except 1949.
 firebreak: false

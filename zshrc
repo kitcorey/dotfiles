@@ -3,9 +3,9 @@
 # first: without the rule logind refuses the lock, and a failed exec here would
 # close the SSH session immediately.
 if [[ -n $SSH_CONNECTION && -z $SSH_INHIBITED ]] && (( $+commands[systemd-inhibit] )) \
-   && systemd-inhibit --what=sleep:idle:handle-lid-switch --mode=block true &>/dev/null; then
+   && systemd-inhibit --no-ask-password --what=sleep:idle:handle-lid-switch --mode=block true &>/dev/null; then
   export SSH_INHIBITED=1
-  exec systemd-inhibit --what=sleep:idle:handle-lid-switch --why="SSH session" --mode=block zsh -l
+  exec systemd-inhibit --no-ask-password --what=sleep:idle:handle-lid-switch --why="SSH session" --mode=block zsh -l
 fi
 
 export PATH=/opt/homebrew/bin:$PATH
