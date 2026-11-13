@@ -110,6 +110,9 @@
     group: root
   when: ansible_facts['distribution'] == 'Ubuntu'
   become: true
+  # In --check, get_url probes with a HEAD request, which the keyserver
+  # rejects with 405 (GET works).
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Add git-core PPA (Ubuntu)
   apt_repository:
