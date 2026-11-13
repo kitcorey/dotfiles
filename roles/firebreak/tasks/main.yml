@@ -9,4 +9,14 @@
   when:
     - firebreak | bool
     - ansible_facts['system'] == 'Linux'
-  notify: Reload udev rules
+  notify: Reload udev rules (firebreak)
+
+- name: Remove Echo Dot udev rules
+  file:
+    path: /etc/udev/rules.d/51-echo-dot.rules
+    state: absent
+  become: true
+  when:
+    - not (firebreak | bool)
+    - ansible_facts['system'] == 'Linux'
+  notify: Reload udev rules (firebreak)

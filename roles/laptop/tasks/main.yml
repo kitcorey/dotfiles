@@ -1,4 +1,7 @@
-# Laptop-only system settings. Every block is opt-in; see defaults/main.yml.
+# Laptop-only system settings, each opt-in; see defaults/main.yml. Every file
+# is written when its setting is on and removed when it is off, so turning a
+# setting off undoes it. The tlp package and service are left alone when
+# tlp_enabled is off.
 
 # --- SSH sleep inhibit -------------------------------------------------------
 # polkit picks up changes in rules.d on its own, so no handler is needed.
@@ -12,6 +15,15 @@
   become: true
   when:
     - ssh_sleep_inhibit | bool
+    - ansible_facts['system'] == 'Linux'
+
+- name: Remove SSH sleep inhibit polkit rule
+  file:
+    path: "/etc/polkit-1/rules.d/50-{{ ansible_user_id }}-inhibit.rules"
+    state: absent
+  become: true
+  when:
+    - not (ssh_sleep_inhibit | bool)
     - ansible_facts['system'] == 'Linux'
 
 # --- TLP ---------------------------------------------------------------------
@@ -55,8 +67,7 @@
     state: absent
   become: true
   when:
-    - tlp_enabled | bool
-    - tlp_tpsmapi_enable | bool
+    - not (tlp_enabled | bool) or (tlp_tpsmapi_enable | bool)
     - ansible_facts['system'] == 'Linux'
   notify: Apply TLP settings
 
@@ -82,8 +93,7 @@
     state: absent
   become: true
   when:
-    - tlp_enabled | bool
-    - tlp_charge_thresholds | default({}, true) | length == 0
+    - not (tlp_enabled | bool) or (tlp_charge_thresholds | default({}, true) | length == 0)
     - ansible_facts['system'] == 'Linux'
   notify: Apply TLP settings
 
@@ -99,4 +109,14 @@
   when:
     - fl1100_no_autosuspend | bool
     - ansible_facts['system'] == 'Linux'
-  notify: Reload udev rules
+  notify: Reload udev rules (laptop)
+
+- name: Remove FL1100 udev rule
+  file:
+    path: /etc/udev/rules.d/99-fl1100-no-autosuspend.rules
+    state: absent
+  become: true
+  when:
+    - not (fl1100_no_autosuspend | bool)
+    - ansible_facts['system'] == 'Linux'
+  notify: Reload udev rules (laptop)

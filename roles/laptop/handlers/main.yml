@@ -1,9 +1,12 @@
+# Only when TLP is on: with it off, the package may not be installed, and
+# removed drop-ins take effect the next time TLP starts.
 - name: Apply TLP settings
   command: tlp start
   become: true
+  when: tlp_enabled | bool
 
 # Reload only: the FL1100 rule matches ACTION=="add", so it takes effect on
 # the next boot or replug, not on devices that are already present.
-- name: Reload udev rules
+- name: Reload udev rules (laptop)
   command: udevadm control --reload
   become: true

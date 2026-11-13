@@ -1,4 +1,4 @@
 # Rules apply to devices plugged in after the reload.
-- name: Reload udev rules
+- name: Reload udev rules (firebreak)
   command: udevadm control --reload
   become: true
