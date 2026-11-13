@@ -1,0 +1,7 @@
+# Off by default. Hosts opt in from host_profiles/<hostname>.yml or
+# ~/.config/dotfiles/local.yml; see site.yml.
+#
+# Installs udev rules giving plugdev/the logged-in user raw USB and serial
+# access to Amazon Echo Dot devices and the MediaTek/Google/HTC USB modes
+# they enumerate in.
+firebreak: false

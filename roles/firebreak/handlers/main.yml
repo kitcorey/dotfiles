@@ -1,0 +1,4 @@
+# Rules apply to devices plugged in after the reload.
+- name: Reload udev rules
+  command: udevadm control --reload
+  become: true

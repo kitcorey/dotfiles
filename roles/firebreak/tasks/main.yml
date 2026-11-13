@@ -1,0 +1,12 @@
+- name: Install Echo Dot udev rules
+  copy:
+    src: 51-echo-dot.rules
+    dest: /etc/udev/rules.d/51-echo-dot.rules
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - firebreak | bool
+    - ansible_facts['system'] == 'Linux'
+  notify: Reload udev rules
