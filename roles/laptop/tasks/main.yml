@@ -120,3 +120,74 @@
     - not (fl1100_no_autosuspend | bool)
     - ansible_facts['system'] == 'Linux'
   notify: Reload udev rules (laptop)
+
+# --- TrackPoint --------------------------------------------------------------
+# A system-wide dconf default, so it needs no desktop session and works over
+# SSH. A value the user sets with gsettings still wins. dconf only reads the
+# system "local" db when /etc/dconf/profile/user lists it, so the profile gets
+# that line added; other entries (distro dbs, lockdowns) are left alone.
+# Turning the setting off removes only the keyfile: the profile may be shared,
+# so its system-db:local line stays (harmless). Running sessions pick up a
+# changed profile at the next login.
+- name: Configure TrackPoint scroll method default (dconf)
+  when:
+    - trackpoint_scroll_method | default('', true) | length > 0
+    - ansible_facts['system'] == 'Linux'
+  become: true
+  block:
+    - name: Install dconf CLI
+      package:
+        name: "{{ 'dconf-cli' if ansible_facts['os_family'] == 'Debian' else 'dconf' }}"
+        state: present
+
+    - name: Create dconf profile and keyfile directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - /etc/dconf/profile
+        - /etc/dconf/db/local.d
+
+    # The user db must come first so the user's own settings win.
+    - name: Make the dconf user profile read the user db
+      lineinfile:
+        path: /etc/dconf/profile/user
+        regexp: '^user-db:'
+        line: user-db:user
+        insertbefore: BOF
+        create: true
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Update dconf databases (laptop)
+
+    - name: Make the dconf user profile read the system local db
+      lineinfile:
+        path: /etc/dconf/profile/user
+        line: system-db:local
+        insertafter: '^user-db:'
+      notify: Update dconf databases (laptop)
+
+    - name: Set TrackPoint scroll method default
+      copy:
+        content: |
+          [org/gnome/desktop/peripherals/pointingstick]
+          scroll-method='{{ trackpoint_scroll_method }}'
+        dest: /etc/dconf/db/local.d/50-trackpoint
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Update dconf databases (laptop)
+
+- name: Remove TrackPoint scroll method default (dconf)
+  file:
+    path: /etc/dconf/db/local.d/50-trackpoint
+    state: absent
+  become: true
+  when:
+    - trackpoint_scroll_method | default('', true) | length == 0
+    - ansible_facts['system'] == 'Linux'
+  notify: Update dconf databases (laptop)

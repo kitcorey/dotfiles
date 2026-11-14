@@ -18,3 +18,9 @@ tlp_charge_thresholds: {}
 # Keep a Fresco Logic FL1100 ExpressCard USB 3.0 controller out of runtime
 # suspend; it fails to resume and its ports go dead.
 fl1100_no_autosuspend: false
+
+# GNOME scroll method for the TrackPoint (pointing stick), e.g.
+# 'on-button-down' to scroll while the middle button is held. Written as a
+# system-wide dconf default (/etc/dconf/db/local.d), so a value set with
+# gsettings overrides it. Empty means no default is written (and removes ours).
+trackpoint_scroll_method: ''

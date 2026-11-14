@@ -12,5 +12,8 @@ tlp_charge_thresholds:
 # Fresco Logic FL1100 ExpressCard USB 3.0 adapter.
 fl1100_no_autosuspend: true
 
+# Scroll by holding the TrackPoint's middle button.
+trackpoint_scroll_method: on-button-down
+
 # Echo Dot udev rules.
 firebreak: true

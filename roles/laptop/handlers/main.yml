@@ -10,3 +10,8 @@
 - name: Reload udev rules (laptop)
   command: udevadm control --reload
   become: true
+
+# Compiles /etc/dconf/db/*.d keyfiles into the binary dbs dconf reads.
+- name: Update dconf databases (laptop)
+  command: dconf update
+  become: true
