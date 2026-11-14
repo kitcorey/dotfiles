@@ -344,6 +344,7 @@
         name: firefox
         state: latest
         update_cache: yes
+        cache_valid_time: 3600
         allow_downgrade: yes
       become: true
       # Depends on the repo added above, which --check doesn't add.

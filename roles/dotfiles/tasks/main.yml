@@ -72,7 +72,12 @@
       - unzip
       - jq
     state: present
+    # cache_valid_time on every apt task: only refresh the package lists if
+    # they're over an hour old, instead of re-fetching every repo (~2s+ each)
+    # on every task. apt_repository refreshes on its own when it adds a repo,
+    # so packages from newly added repos are still found.
     update_cache: yes
+    cache_valid_time: 3600
   when: ansible_facts['os_family'] == 'Debian'
   become: true
 
@@ -123,6 +128,7 @@
     name: git
     state: latest
     update_cache: yes
+    cache_valid_time: 3600
   when: ansible_facts['distribution'] == 'Ubuntu'
   become: true
   # Depends on a dir/repo created by a previous task, which --check doesn't do.
@@ -497,6 +503,7 @@
     name: gh
     state: latest
     update_cache: yes
+    cache_valid_time: 3600
   when: ansible_facts['os_family'] == 'Debian'
   become: true
   # Depends on a dir/repo created by a previous task, which --check doesn't do.
@@ -530,6 +537,7 @@
     name: mise
     state: present
     update_cache: yes
+    cache_valid_time: 3600
   when: ansible_facts['os_family'] == 'Debian'
   become: true
   # Depends on a dir/repo created by a previous task, which --check doesn't do.
