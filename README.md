@@ -49,8 +49,8 @@ ansible-playbook site.yml --ask-become-pass -e install_rvm=true
 - **Neovim** — latest AppImage (Linux) or via Homebrew (macOS)
 - **zsh** — set as default shell (Linux)
 - **mise** — tool version manager (apt/dnf on Linux, Homebrew on macOS). Installs
-  the tools in `mise-config.toml`: starship, ripgrep, zoxide, aichat, hk, go,
-  node, python and the TypeScript LSP
+  the tools in `mise-config.toml`: starship, ripgrep, zoxide, aichat, hk,
+  shellcheck, yamllint, go, node, python and the TypeScript LSP
 - **gh**, **gitleaks**, **Bitwarden CLI**, **tree-sitter CLI**
 - **fzf** — fuzzy finder, cloned to `~/.fzf`
 - **tmux** + tpm (plugin manager)
@@ -62,6 +62,21 @@ ansible-playbook site.yml --ask-become-pass -e install_rvm=true
 
 - **aerc** (opt-in, Linux) — terminal mail client with vim keys, composing in neovim.
   See [Mail (aerc)](#mail-aerc)
+
+## Git hooks
+
+[hk](https://hk.jdx.dev) runs the hooks in `hk.pkl`; `~/.gitconfig` registers
+them for every repo, and `HK=0` turns them off.
+
+- **pre-commit:** gitleaks on staged changes, trailing whitespace, final
+  newlines, merge-conflict markers, `zsh -n`, shellcheck and yamllint
+- **commit-msg:** subject must be `area: summary` (merges, reverts and
+  `fixup!`/`squash!` commits are allowed)
+- **pre-push:** gitleaks on the full history and `ansible-playbook
+  --syntax-check site.yml` when the playbook, roles or host profiles change
+
+Run everything by hand with `hk check --all`, and auto-fix whitespace with
+`hk fix --all`.
 
 ## Dotfiles managed
 
