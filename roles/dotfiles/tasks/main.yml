@@ -56,6 +56,7 @@
       - mise
       - tree-sitter-cli
       - ykman
+      - jq
     state: present
   when: ansible_facts['os_family'] == 'Darwin'
 
@@ -69,6 +70,7 @@
       - python3-pip
       - python3-venv
       - unzip
+      - jq
     state: present
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
@@ -138,6 +140,7 @@
       - neovim
       - fzf
       - unzip
+      - jq
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
   become: true
@@ -624,6 +627,47 @@
     state: link
     force: true
   when: ansible_facts['system'] == 'Linux'
+
+# Claude Code status line. The script is plain dotfile content, so symlink it.
+# settings.json is also written by Claude Code itself (/config, permission
+# approvals, effort level), so don't own the whole file: merge in just the
+# statusLine key and leave everything else as Claude last saved it.
+# The script needs jq (installed above).
+# sort_keys/ensure_ascii match how Claude writes the file, so a no-op merge
+# leaves it byte-identical.
+- name: Ensure ~/.claude exists
+  file:
+    path: "{{ user_home }}/.claude"
+    state: directory
+    mode: '0700'
+
+- name: Symlink Claude Code status line script
+  file:
+    src: "{{ dotfiles_repo }}/claude/statusline-command.sh"
+    dest: "{{ user_home }}/.claude/statusline-command.sh"
+    state: link
+    force: true
+
+- name: Read Claude Code settings
+  slurp:
+    src: "{{ user_home }}/.claude/settings.json"
+  register: claude_settings_raw
+  failed_when: false
+
+- name: Set Claude Code status line in settings.json
+  copy:
+    dest: "{{ user_home }}/.claude/settings.json"
+    mode: '0600'
+    # Write through a symlinked settings.json instead of replacing the link.
+    follow: true
+    # A missing or empty file counts as {}. Invalid JSON still fails the run
+    # rather than being overwritten.
+    content: |
+      {{ ((claude_settings_raw.content | default('') | b64decode | trim) or '{}')
+         | from_json
+         | combine({'statusLine': {'type': 'command',
+                                   'command': 'bash ~/.claude/statusline-command.sh'}})
+         | to_nice_json(indent=2, sort_keys=False, ensure_ascii=False) }}
 
 - name: Ensure starship prompt is initialized in .zshrc
   lineinfile:
