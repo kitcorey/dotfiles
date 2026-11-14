@@ -252,3 +252,139 @@
     path: "{{ user_home }}/.config/tmux/local.d/clipboard.conf"
     state: absent
   when: not (tmux_wayland_clipboard | bool)
+
+# --- Firefox (Mozilla deb) ---------------------------------------------------
+# Installs Mozilla's deb so 1Password's extension can reach the desktop app
+# (1Password rejects the snap's portal-launched native-messaging host). The
+# deb replaces Ubuntu's transitional firefox package. This role doesn't touch
+# the snap or profiles: copying the profile from ~/snap/firefox/common/.mozilla
+# to ~/.mozilla, then `snap remove firefox` (which deletes ~/snap/firefox), are
+# one-time manual steps.
+- name: Install Firefox from Mozilla's apt repo
+  when:
+    - firefox_mozilla_deb | bool
+    - ansible_facts['system'] == 'Linux'
+    - ansible_facts['distribution'] == 'Ubuntu'
+  vars:
+    firefox_mozilla_key: /etc/apt/keyrings/packages.mozilla.org.asc
+    firefox_mozilla_key_cache: "{{ user_home }}/.cache/dotfiles/packages.mozilla.org.asc"
+    firefox_mozilla_key_fpr: '35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3'
+  block:
+    # The key is fetched to the cache and its fingerprint checked before it
+    # reaches /etc/apt/keyrings, so apt never trusts a swapped key. These
+    # steps touch only the cache, so they also run under --check.
+    - name: Create the dotfiles cache directory
+      file:
+        path: "{{ user_home }}/.cache/dotfiles"
+        state: directory
+        mode: '0755'
+      check_mode: false
+
+    - name: Download Mozilla's apt signing key
+      get_url:
+        url: https://packages.mozilla.org/apt/repo-signing-key.gpg
+        dest: "{{ firefox_mozilla_key_cache }}"
+        # Re-fetch every run so a rotated key shows up (and fails the check).
+        force: true
+        mode: '0644'
+      check_mode: false
+
+    - name: Read the signing key's fingerprint
+      shell: >-
+        gpg --show-keys --with-colons {{ firefox_mozilla_key_cache | quote }}
+        | awk -F: '$1 == "pub" { p = 1; next } p && $1 == "fpr" { print $10; p = 0 }'
+      register: firefox_key_fpr
+      changed_when: false
+      check_mode: false
+
+    - name: Check the signing key is Mozilla's
+      assert:
+        that: firefox_key_fpr.stdout_lines == [firefox_mozilla_key_fpr]
+        fail_msg: >-
+          {{ firefox_mozilla_key_cache }} has primary fingerprint(s)
+          {{ firefox_key_fpr.stdout_lines }}, expected {{ firefox_mozilla_key_fpr }}.
+          Not installing it.
+        quiet: true
+
+    - name: Install Mozilla's apt signing key
+      copy:
+        src: "{{ firefox_mozilla_key_cache }}"
+        remote_src: true
+        dest: "{{ firefox_mozilla_key }}"
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+    - name: Add Mozilla's apt repository
+      apt_repository:
+        repo: deb [signed-by={{ firefox_mozilla_key }}] https://packages.mozilla.org/apt mozilla main
+        filename: mozilla
+        state: present
+      become: true
+
+    # 1000, not 600 like gh: Ubuntu's transitional firefox (1:1snap1-...) has
+    # an epoch, so it outranks every Mozilla version. Only a pin of 1000 or
+    # more lets apt replace it. firefox* (not Mozilla's suggested *) keeps the
+    # pin to Firefox and its language packs.
+    - name: Prefer Firefox from Mozilla's repo
+      copy:
+        dest: /etc/apt/preferences.d/mozilla
+        content: |
+          Package: firefox*
+          Pin: origin packages.mozilla.org
+          Pin-Priority: 1000
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+    - name: Install Firefox from Mozilla's repo
+      apt:
+        name: firefox
+        state: latest
+        update_cache: yes
+        allow_downgrade: yes
+      become: true
+      # Depends on the repo added above, which --check doesn't add.
+      ignore_errors: "{{ ansible_check_mode }}"
+
+    # 1Password trusts /usr/lib/firefox/firefox directly. A portal entry
+    # would trust every app launched through xdg-desktop-portal.
+    - name: Drop xdg-desktop-portal from 1Password's browser allowlist
+      lineinfile:
+        path: /etc/1password/custom_allowed_browsers
+        regexp: '^\s*(/usr/libexec/)?xdg-desktop-portal\s*$'
+        state: absent
+      become: true
+
+    # site=, not origin=: the repo's Release file has Origin:
+    # namespaces/moz-fx-productdelivery-pr-38b5/repositories/mozilla, so
+    # origin=packages.mozilla.org would match nothing.
+    - name: Let unattended-upgrades install Firefox updates
+      copy:
+        dest: /etc/apt/apt.conf.d/51unattended-upgrades-mozilla
+        content: |
+          // Managed by ansible (laptop role, firefox_mozilla_deb).
+          Unattended-Upgrade::Origins-Pattern:: "site=packages.mozilla.org";
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+# Leaves the installed Firefox and profiles alone. Without the pin, Ubuntu's
+# transitional firefox (1:1snap1-..., epoch 1) outranks the deb again, so the
+# next apt upgrade replaces it and reinstalls the snap.
+- name: Remove Mozilla's apt repo, key, pin and unattended-upgrades file
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/mozilla.list
+    - /etc/apt/preferences.d/mozilla
+    - /etc/apt/keyrings/packages.mozilla.org.asc
+    - /etc/apt/apt.conf.d/51unattended-upgrades-mozilla
+  become: true
+  when:
+    - not (firefox_mozilla_deb | bool)
+    - ansible_facts['system'] == 'Linux'

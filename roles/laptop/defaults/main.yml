@@ -36,3 +36,12 @@ multihomed_arp_fix: false
 # Terminal/VTE) on Wayland. Installs wl-clipboard and writes
 # ~/.config/tmux/local.d/clipboard.conf, which tmux.conf sources if present.
 tmux_wayland_clipboard: false
+
+# Install Firefox as Mozilla's .deb from packages.mozilla.org, so
+# the 1Password extension can reach the desktop app (1Password rejects the
+# snap's portal-launched native-messaging host). Ubuntu only. Pins firefox* to
+# Mozilla's repo and lets unattended-upgrades install Firefox updates. It
+# doesn't touch the snap or profiles: copying the profile to ~/.mozilla and
+# `snap remove firefox` are manual. Off removes the repo, key, pin and
+# unattended-upgrades file; the next apt upgrade then brings back the snap.
+firefox_mozilla_deb: false

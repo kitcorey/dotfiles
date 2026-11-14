@@ -44,6 +44,9 @@ ansible-playbook site.yml --ask-become-pass -e install_rvm=true
 - **tmux** + tpm (plugin manager)
 - **vim-plug** — Vim plugin manager
 - **Internal CA** — homelab CA cert added to system trust
+- **Firefox** (opt-in, Ubuntu) — `firefox_mozilla_deb` in the laptop role installs
+  Mozilla's deb from packages.mozilla.org, with unattended upgrades. Moving the
+  snap's profile and removing the snap are manual
 
 ## Dotfiles managed
 

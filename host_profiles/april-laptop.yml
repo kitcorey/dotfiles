@@ -24,3 +24,6 @@ firebreak: true
 
 # GNOME Terminal ignores OSC 52; send tmux copies to wl-copy instead.
 tmux_wayland_clipboard: true
+
+# Mozilla's Firefox deb instead of the snap, so 1Password's extension works.
+firefox_mozilla_deb: true
