@@ -26,3 +26,9 @@
 - name: Reset multi-homed ARP sysctl settings (laptop)
   command: sysctl -w net.ipv4.conf.all.arp_ignore=0 net.ipv4.conf.all.arp_announce=0
   become: true
+
+# Picks up added or removed unit drop-ins.
+- name: Reload systemd units (laptop)
+  systemd:
+    daemon_reload: true
+  become: true

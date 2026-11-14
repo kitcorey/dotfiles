@@ -45,3 +45,11 @@ tmux_wayland_clipboard: false
 # `snap remove firefox` are manual. Off removes the repo, key, pin and
 # unattended-upgrades file; the next apt upgrade then brings back the snap.
 firefox_mozilla_deb: false
+
+# Let apt's daily jobs refresh package lists and install unattended upgrades
+# on battery. By default both the systemd units (ConditionACPower=true) and
+# unattended-upgrades (OnlyOnACPower) skip the day's run when unplugged, so a
+# laptop used on battery can go days without security updates. Debian/Ubuntu.
+# Writes /etc/apt/apt.conf.d/51unattended-upgrades-on-battery and systemd
+# drop-ins for apt-daily and apt-daily-upgrade.
+unattended_upgrades_on_battery: false

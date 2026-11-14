@@ -388,3 +388,65 @@
   when:
     - not (firefox_mozilla_deb | bool)
     - ansible_facts['system'] == 'Linux'
+
+# --- Unattended upgrades on battery ------------------------------------------
+# Two gates skip apt's daily run on battery: ConditionACPower=true in the
+# apt-daily{,-upgrade}.service units, and unattended-upgrades' own
+# OnlyOnACPower. An empty ConditionACPower= in a drop-in clears the unit's
+# conditions (it has no others).
+- name: Allow unattended upgrades on battery
+  when:
+    - unattended_upgrades_on_battery | bool
+    - ansible_facts['system'] == 'Linux'
+    - ansible_facts['os_family'] == 'Debian'
+  become: true
+  block:
+    - name: Set unattended-upgrades OnlyOnACPower to false
+      copy:
+        dest: /etc/apt/apt.conf.d/51unattended-upgrades-on-battery
+        content: |
+          // Managed by ansible (laptop role, unattended_upgrades_on_battery).
+          Unattended-Upgrade::OnlyOnACPower "false";
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create apt-daily drop-in directories
+      file:
+        path: "/etc/systemd/system/{{ item }}.service.d"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - apt-daily
+        - apt-daily-upgrade
+
+    - name: Let apt-daily units run on battery (systemd drop-ins)
+      copy:
+        dest: "/etc/systemd/system/{{ item }}.service.d/50-on-battery.conf"
+        content: |
+          # Managed by ansible (laptop role, unattended_upgrades_on_battery).
+          [Unit]
+          ConditionACPower=
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - apt-daily
+        - apt-daily-upgrade
+      notify: Reload systemd units (laptop)
+
+- name: Remove unattended upgrades on battery settings
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/apt.conf.d/51unattended-upgrades-on-battery
+    - /etc/systemd/system/apt-daily.service.d/50-on-battery.conf
+    - /etc/systemd/system/apt-daily-upgrade.service.d/50-on-battery.conf
+  become: true
+  when:
+    - not (unattended_upgrades_on_battery | bool)
+    - ansible_facts['system'] == 'Linux'
+  notify: Reload systemd units (laptop)

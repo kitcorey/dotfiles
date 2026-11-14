@@ -27,3 +27,6 @@ tmux_wayland_clipboard: true
 
 # Mozilla's Firefox deb instead of the snap, so 1Password's extension works.
 firefox_mozilla_deb: true
+
+# Mostly used unplugged; install security updates on battery too.
+unattended_upgrades_on_battery: true
