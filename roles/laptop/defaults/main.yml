@@ -31,3 +31,8 @@ trackpoint_scroll_method: ''
 # conflict with the host itself, and the wired connection comes up without
 # routes. Writes /etc/sysctl.d/90-arp-multihomed.conf.
 multihomed_arp_fix: false
+
+# Pipe tmux copies to wl-copy, for terminals that ignore OSC 52 (GNOME
+# Terminal/VTE) on Wayland. Installs wl-clipboard and writes
+# ~/.config/tmux/local.d/clipboard.conf, which tmux.conf sources if present.
+tmux_wayland_clipboard: false

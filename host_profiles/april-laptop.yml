@@ -21,3 +21,6 @@ multihomed_arp_fix: true
 
 # Echo Dot udev rules.
 firebreak: true
+
+# GNOME Terminal ignores OSC 52; send tmux copies to wl-copy instead.
+tmux_wayland_clipboard: true

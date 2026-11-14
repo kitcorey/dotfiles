@@ -215,3 +215,40 @@
     - not (multihomed_arp_fix | bool)
     - ansible_facts['system'] == 'Linux'
   notify: Reset multi-homed ARP sysctl settings (laptop)
+
+# --- tmux system clipboard ---------------------------------------------------
+# tmux.conf sends copies with OSC 52, which iTerm2 honors but VTE ignores.
+# copy-command makes copy-pipe (y, mouse drag) also pipe the selection to
+# wl-copy. Running tmux servers pick it up on `prefix r` or restart.
+- name: Pipe tmux copies to the Wayland clipboard
+  when:
+    - tmux_wayland_clipboard | bool
+    - ansible_facts['system'] == 'Linux'
+  block:
+    - name: Install wl-clipboard
+      package:
+        name: wl-clipboard
+        state: present
+      become: true
+
+    - name: Create tmux config directory
+      file:
+        path: "{{ user_home }}/.config/tmux/local.d"
+        state: directory
+        mode: '0755'
+
+    - name: Write host-local tmux config
+      copy:
+        content: |
+          # Managed by ansible (laptop role, tmux_wayland_clipboard).
+          # The server may have started without WAYLAND_DISPLAY (e.g. over
+          # SSH); default it so wl-copy can reach the compositor.
+          set -s copy-command 'WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0} wl-copy --type text/plain'
+        dest: "{{ user_home }}/.config/tmux/local.d/clipboard.conf"
+        mode: '0644'
+
+- name: Remove host-local tmux clipboard config
+  file:
+    path: "{{ user_home }}/.config/tmux/local.d/clipboard.conf"
+    state: absent
+  when: not (tmux_wayland_clipboard | bool)
