@@ -1,0 +1,21 @@
+# Managed by ansible (aerc role, aerc_accounts). Edits here are overwritten.
+# No passwords in this file: aerc runs *-cred-cmd each time it connects.
+{% for a in aerc_accounts %}
+{%   set p = aerc_providers[a.provider] %}
+{%   set imap_login = a.login | default(a.address.split('@')[0] if p.imap_login == 'local_part' else a.address) %}
+
+[{{ a.name }}]
+source = imaps://{{ imap_login | urlencode }}@{{ p.imap }}
+source-cred-cmd = {{ a.password_cmd }}
+outgoing = {{ p.outgoing_scheme }}://{{ a.smtp_login | default(a.address) | urlencode }}@{{ p.outgoing_host }}
+outgoing-cred-cmd = {{ a.password_cmd }}
+from = {{ a.real_name | default(aerc_real_name, true) }} <{{ a.address }}>
+default = INBOX
+{%   if p.copy_to %}
+copy-to = {{ p.copy_to }}
+{%   endif %}
+postpone = {{ p.postpone }}
+archive = {{ p.archive }}
+folders-sort = {{ p.folders_sort }}
+cache-headers = true
+{% endfor %}

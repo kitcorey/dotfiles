@@ -1,0 +1,57 @@
+# aerc terminal mail client (Linux only). Off until `aerc_accounts` lists an
+# account. Put accounts in ~/.config/dotfiles/local.yml (uncommitted), not a
+# host profile: addresses and 1Password item names don't belong in a public
+# repo.
+#
+# Each account:
+#   name:         tab name in aerc
+#   provider:     icloud or gmail (key of aerc_providers below)
+#   address:      the From address, e.g. you@icloud.com
+#   real_name:    display name; defaults to aerc_real_name
+#   login:        IMAP username, if it isn't the provider's default
+#   smtp_login:   SMTP username, if it isn't the address
+#   password_cmd: shell command that prints the app-specific password
+#
+# Both providers need an app-specific password, not the account password:
+#   iCloud: account.apple.com > Sign-In and Security > App-Specific Passwords
+#   Gmail:  myaccount.google.com/apppasswords (needs 2-Step Verification)
+#
+# Example:
+#   aerc_accounts:
+#     - name: iCloud
+#       provider: icloud
+#       address: you@icloud.com
+#       password_cmd: op read 'op://Private/iCloud Mail aerc/password'
+#     - name: Gmail
+#       provider: gmail
+#       address: you@gmail.com
+#       password_cmd: op read 'op://Private/Gmail aerc/password'
+aerc_accounts: []
+
+aerc_real_name: ''
+
+# Server and folder settings per provider. imap_login is the default IMAP
+# username: Apple wants the part of the address before the @ (the full address
+# is what SMTP takes); Gmail takes the full address for both.
+aerc_providers:
+  icloud:
+    imap: imap.mail.me.com:993
+    imap_login: local_part
+    # smtp = STARTTLS (here on 587); smtps = TLS from the start.
+    outgoing_scheme: smtp
+    outgoing_host: smtp.mail.me.com:587
+    copy_to: Sent Messages
+    postpone: Drafts
+    archive: Archive
+    folders_sort: INBOX,Drafts,Sent Messages,Archive,Junk,Deleted Messages
+  gmail:
+    imap: imap.gmail.com:993
+    imap_login: address
+    outgoing_scheme: smtps
+    outgoing_host: smtp.gmail.com:465
+    # Gmail files mail sent through its SMTP server in Sent Mail itself;
+    # copying it there too would leave duplicates.
+    copy_to: ''
+    postpone: '[Gmail]/Drafts'
+    archive: '[Gmail]/All Mail'
+    folders_sort: INBOX,[Gmail]/Drafts,[Gmail]/Sent Mail,[Gmail]/All Mail,[Gmail]/Spam,[Gmail]/Trash

@@ -1,0 +1,69 @@
+# aerc mail client; see defaults/main.yml. Does nothing until aerc_accounts
+# lists an account. Turning it off leaves ~/.config/aerc and the package alone.
+# Linux only: on macOS aerc doesn't read ~/.config/aerc unless XDG_CONFIG_HOME
+# is set, and this hasn't been tried there.
+- name: Set up aerc
+  when:
+    - aerc_accounts | length > 0
+    - ansible_facts['system'] == 'Linux'
+  block:
+    - name: Check aerc account settings
+      assert:
+        that:
+          - item.name is defined and item.address is defined and item.password_cmd is defined
+          - item.provider | default('') in aerc_providers
+          - (item.real_name | default(aerc_real_name, true) | length) > 0
+        fail_msg: >-
+          aerc account {{ item.name | default(item) }} needs name, address,
+          password_cmd, a provider from {{ aerc_providers.keys() | list }},
+          and real_name (or aerc_real_name).
+        quiet: true
+      loop: "{{ aerc_accounts }}"
+      loop_control:
+        label: "{{ item.name | default('?') }}"
+
+    # w3m renders HTML mail (see aerc/aerc.conf).
+    - name: Install aerc and w3m (Debian)
+      apt:
+        name:
+          - aerc
+          - w3m
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Create aerc config directory
+      file:
+        path: "{{ user_home }}/.config/aerc"
+        state: directory
+        mode: '0700'
+
+    # Keep a hand-written aerc.conf or binds.conf (e.g. from aerc's first-run
+    # setup) as <name>.bak instead of replacing it with the symlink.
+    - name: Back up existing aerc.conf and binds.conf
+      shell: |
+        f={{ (user_home ~ '/.config/aerc/' ~ item) | quote }}
+        if [ -f "$f" ] && [ ! -L "$f" ]; then mv "$f" "$f.bak"; echo moved; fi
+      loop:
+        - aerc.conf
+        - binds.conf
+      register: aerc_conf_backup
+      changed_when: "'moved' in aerc_conf_backup.stdout"
+
+    - name: Symlink aerc.conf and binds.conf
+      file:
+        src: "{{ dotfiles_repo }}/aerc/{{ item }}"
+        dest: "{{ user_home }}/.config/aerc/{{ item }}"
+        state: link
+        force: true
+      loop:
+        - aerc.conf
+        - binds.conf
+
+    # aerc refuses to start if accounts.conf is readable by anyone else.
+    - name: Write aerc accounts.conf
+      template:
+        src: accounts.conf.j2
+        dest: "{{ user_home }}/.config/aerc/accounts.conf"
+        mode: '0600'
+        backup: true

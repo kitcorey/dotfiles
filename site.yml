@@ -19,7 +19,7 @@
   environment:
     HK: "0"
   # Every role has a tag of its own name, so one can run alone:
-  #   ansible-playbook site.yml -t laptop
+  #   ansible-playbook site.yml -t aerc
   # The pre_tasks are tagged `always` so host vars still load under -t.
   pre_tasks:
     # Committed per-host profile, keyed by short hostname. Holds machine
@@ -55,3 +55,4 @@
     - { role: nfs_mounts, tags: nfs_mounts }
     - { role: laptop, tags: laptop }
     - { role: firebreak, tags: firebreak }
+    - { role: aerc, tags: aerc }

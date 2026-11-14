@@ -73,3 +73,30 @@ vim.diagnostic.config({
 })
 
 vim.opt.laststatus = 3
+
+-- Mail. aerc compose buffers are *.eml, so neovim's mail ftplugin already sets
+-- textwidth=72 and auto-wrap. Add spell check, and with aerc's edit-headers
+-- don't auto-wrap header lines: a wrapped To:/Cc: line has no leading space,
+-- so aerc would stop reading it as a header. Headers end at the first blank line.
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('UserMail', {}),
+  pattern = 'mail',
+  callback = function(ev)
+    vim.opt_local.spell = true
+    vim.api.nvim_create_autocmd({ 'InsertEnter', 'CursorMovedI' }, {
+      group = vim.api.nvim_create_augroup('UserMailHeaders' .. ev.buf, {}),
+      buffer = ev.buf,
+      callback = function()
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local in_headers = false
+        if vim.api.nvim_buf_get_lines(ev.buf, 0, 1, false)[1]:match('^[%w-]+:') then
+          for i, line in ipairs(vim.api.nvim_buf_get_lines(ev.buf, 0, row, false)) do
+            if line == '' then break end
+            if i == row then in_headers = true end
+          end
+        end
+        vim.bo[ev.buf].textwidth = in_headers and 0 or 72
+      end,
+    })
+  end,
+})

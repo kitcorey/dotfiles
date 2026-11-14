@@ -27,9 +27,10 @@ ANSIBLE_BECOME_EXE=sudo.ws ansible-playbook site.yml --ask-become-pass
 Add `--check --diff` for a dry run.
 
 Each role has a tag with its own name (`dotfiles`, `nfs_mounts`, `laptop`,
-`firebreak`), so you can run a single piece on its own:
+`firebreak`, `aerc`), so you can run a single piece on its own:
 
 ```bash
+ansible-playbook site.yml -t aerc --ask-become-pass
 ansible-playbook site.yml -t laptop,firebreak --ask-become-pass
 ansible-playbook site.yml --skip-tags dotfiles --ask-become-pass
 ```
@@ -59,6 +60,9 @@ ansible-playbook site.yml --ask-become-pass -e install_rvm=true
   Mozilla's deb from packages.mozilla.org, with unattended upgrades. Moving the
   snap's profile and removing the snap are manual
 
+- **aerc** (opt-in, Linux) — terminal mail client with vim keys, composing in neovim.
+  See [Mail (aerc)](#mail-aerc)
+
 ## Dotfiles managed
 
 Symlinks created in `$HOME`:
@@ -78,3 +82,34 @@ The aichat `config.yaml` does not contain API keys. Create `aichat/.env` in this
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+### Mail (aerc)
+
+The `aerc` role installs aerc and w3m, symlinks `aerc/aerc.conf` and
+`aerc/binds.conf` into `~/.config/aerc`, and writes `accounts.conf` (mode 0600)
+from `aerc_accounts`. Accounts go in `~/.config/dotfiles/local.yml`, which is not
+committed:
+
+```yaml
+aerc_real_name: Your Name
+aerc_accounts:
+  - name: iCloud
+    provider: icloud
+    address: you@icloud.com
+    password_cmd: op read 'op://Private/iCloud Mail aerc/password'
+  - name: Gmail
+    provider: gmail
+    address: you@gmail.com
+    password_cmd: op read 'op://Private/Gmail aerc/password'
+```
+
+Both providers need an **app-specific password**, saved in 1Password under
+the item named in `password_cmd`:
+
+- iCloud: account.apple.com → Sign-In and Security → App-Specific Passwords
+- Gmail: myaccount.google.com/apppasswords (needs 2-Step Verification)
+
+aerc runs `password_cmd` each time it connects, so no password is written to
+disk. Server and folder settings per provider are in
+`roles/aerc/defaults/main.yml`. Then run `ansible-playbook site.yml -t aerc
+--ask-become-pass`.
