@@ -36,6 +36,25 @@ ansible-playbook site.yml --skip-tags dotfiles --ask-become-pass
 Host profiles and `local.yml` still load under `-t` (those tasks are tagged
 `always`). `--list-tags` shows the tags.
 
+The `dotfiles` role is split further, one tag per task file in
+`roles/dotfiles/tasks/`:
+
+| Tag | Covers |
+| --- | --- |
+| `packages` | system packages and the git-core PPA, gh and mise repos |
+| `shell` | zsh, bash/csh/readline config, starship, fzf |
+| `git` | `.gitconfig`, `.gitignore`, git from the git-core PPA |
+| `gh` | GitHub CLI |
+| `vim` / `nvim` | Vim and Neovim config, vim-plug, Neovim, tree-sitter |
+| `tmux` | `tmux.conf`, tpm |
+| `ca` | internal CA cert |
+| `tools` | Bitwarden CLI, gitleaks, Nerd Font, flake8, aichat, rvm |
+| `mise` | mise, its config and `mise install` |
+| `claude` | Claude Code status line |
+
+`claude`, `vim`, `nvim`, `tmux` and `tools` only touch your home directory,
+so they don't need `--ask-become-pass`.
+
 To also install RVM:
 
 ```bash

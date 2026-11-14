@@ -1,0 +1,23 @@
+- name: Ensure ~/.config/mise exists
+  file:
+    path: "{{ user_home }}/.config/mise"
+    state: directory
+    mode: '0755'
+
+- name: Symlink mise config
+  file:
+    src: "{{ dotfiles_repo }}/mise-config.toml"
+    dest: "{{ user_home }}/.config/mise/config.toml"
+    state: link
+    force: true
+
+# `mise activate` only sets up PATH/shims; it does not install missing tools.
+# Install everything declared in the global config so the tools that moved off
+# cargo/brew (starship, ripgrep, zoxide, aichat, ...) actually exist — notably
+# starship, whose `starship init` runs unconditionally at shell startup.
+- name: Install mise-managed tools
+  command: mise install --yes
+  environment:
+    PATH: "/opt/homebrew/bin:{{ user_home }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
+  register: mise_install
+  changed_when: "'Installing' in mise_install.stdout or 'Installing' in mise_install.stderr"

@@ -1,0 +1,98 @@
+- name: Set zsh as default shell for user (Debian/Ubuntu)
+  user:
+    name: "{{ ansible_facts['user_id'] }}"
+    shell: /usr/bin/zsh
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - ansible_facts['user_shell'] != '/usr/bin/zsh'
+  become: true
+
+- name: Copy cshrc
+  copy:
+    src: "{{ dotfiles_repo }}/cshrc"
+    dest: "{{ user_home }}/.cshrc"
+    mode: '0644'
+
+- name: Copy inputrc file
+  copy:
+    src: "{{ dotfiles_repo }}/inputrc"
+    dest: "{{ user_home }}/.inputrc"
+    mode: '0644'
+
+# Ensure ~/.shellrc exists before symlinking bashrc.d and zshrc.d
+- name: Ensure ~/.shellrc directory exists
+  file:
+    path: "{{ user_home }}/.shellrc"
+    state: directory
+    mode: '0755'
+
+- name: Symlink bashrc.d
+  file:
+    src: "{{ dotfiles_repo }}/bashrc.d"
+    dest: "{{ user_home }}/.shellrc/bashrc.d"
+    state: link
+    force: true
+
+- name: Symlink zshrc.d
+  file:
+    src: "{{ dotfiles_repo }}/zshrc.d"
+    dest: "{{ user_home }}/.shellrc/zshrc.d"
+    state: link
+    force: true
+
+- name: Symlink .zshrc
+  file:
+    src: "{{ dotfiles_repo }}/zshrc"
+    dest: "{{ user_home }}/.zshrc"
+    state: link
+    force: true
+
+- name: Symlink .zshenv
+  file:
+    src: "{{ dotfiles_repo }}/zshenv"
+    dest: "{{ user_home }}/.zshenv"
+    state: link
+    force: true
+
+- name: Clone fzf
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: "{{ user_home }}/.fzf"
+    update: yes
+  when:
+    - ansible_facts['system'] == 'Linux'
+  register: fzf_clone
+
+# Re-run the installer whenever the clone updates: it downloads the fzf binary
+# matching the checkout. Otherwise a fresh shell/key-bindings.zsh ends up paired
+# with an old binary that rejects its newer options, and Ctrl-R silently fails.
+# (`is exists` checks the controller, which is this machine — site.yml is local.)
+- name: Install fzf binary, key bindings and completion
+  shell: |
+    {{ user_home }}/.fzf/install --key-bindings --completion --no-update-rc
+  args:
+    chdir: "{{ user_home }}/.fzf"
+  when: fzf_clone is changed or not (user_home + '/.fzf.bash') is exists
+
+- name: Ensure ~/.local/bin is in PATH in .zshrc
+  lineinfile:
+    path: "{{ user_home }}/.zshrc"
+    regexp: '(^|\n)\s*export\s+PATH=.*\.local/bin.*:\$PATH'
+    line: 'export PATH="$HOME/.local/bin:$PATH"'
+    insertafter: EOF
+    state: present
+
+- name: Symlink starship.toml
+  file:
+    src: "{{ dotfiles_repo }}/starship.toml"
+    dest: "{{ user_home }}/.config/starship.toml"
+    state: link
+    force: true
+
+- name: Ensure starship prompt is initialized in .zshrc
+  lineinfile:
+    path: "{{ user_home }}/.zshrc"
+    regexp: '^\s*eval\s*"\$\(\s*starship\s+init\s+zsh\s*\)"'
+    line: 'eval "$(starship init zsh)"'
+    insertafter: EOF
+    state: present

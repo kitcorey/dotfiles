@@ -1,0 +1,27 @@
+- name: Ensure ~/.vim/autoload directory exists
+  file:
+    path: "{{ user_home }}/.vim/autoload"
+    state: directory
+    mode: '0755'
+
+- name: Download vim-plug
+  get_url:
+    url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    dest: "{{ user_home }}/.vim/autoload/plug.vim"
+    mode: '0644'
+  # Depends on a dir/repo created by a previous task, which --check doesn't do.
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Symlink .vimrc
+  file:
+    src: "{{ dotfiles_repo }}/vimrc"
+    dest: "{{ user_home }}/.vimrc"
+    state: link
+    force: true
+
+- name: Copy vim/after directory
+  copy:
+    src: "{{ dotfiles_repo }}/vim/after"
+    dest: "{{ user_home }}/.vim/after"
+    owner: "{{ ansible_facts['user_id'] }}"
+    mode: '0755'
