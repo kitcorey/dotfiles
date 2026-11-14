@@ -1,7 +1,8 @@
 amends "package://github.com/jdx/hk/releases/download/v1.45.0/hk@1.45.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.45.0/hk@1.45.0#/Builtins.pkl"
 
-// Secret scanning only. gitleaks is installed by the playbook (Homebrew on
-// macOS, GitHub release into ~/.local/bin on Linux).
+// gitleaks is installed by the playbook (Homebrew on macOS, GitHub release
+// into ~/.local/bin on Linux); shellcheck and yamllint come from mise.
 
 local gitleaksStaged: Step = new Step {
   check = "mise exec -- gitleaks git --pre-commit --staged --redact --verbose"
@@ -11,21 +12,81 @@ local gitleaksHistory: Step = new Step {
   check = "mise exec -- gitleaks git --redact --verbose"
 }
 
+// shellcheck can't parse zsh, so syntax-check zsh files with zsh itself.
+// `zsh -n a b` would treat b as an argument to a, hence the loop.
+local zshSyntax: Step = new Step {
+  glob = List("zshrc", "zshenv", "zlogin", "zshrc.d/*.zsh")
+  check = #"for f in {{ files }}; do zsh -n "$f" || exit 1; done"#
+}
+
+local shellcheck: Step = (Builtins.shellcheck) {
+  glob = List("**/*.sh", "**/*.bash", "bashrc")
+  check = "mise exec -- shellcheck {{ files }}"
+}
+
+// Non-strict: .yamllint extends `relaxed`, whose remaining warnings shouldn't
+// block a commit.
+local yamllint: Step = (Builtins.yamllint) {
+  glob = List("site.yml", "roles/**/*.yml", "host_profiles/*.yml", "aichat/*.yaml")
+  check = "mise exec -- yamllint {{ files }}"
+}
+
+// Takes ~1.8s, almost all Ansible startup, so it runs per push, not per commit.
+local ansibleSyntax: Step = new Step {
+  glob = List("site.yml", "roles/**", "host_profiles/**")
+  check = "ansible-playbook --syntax-check site.yml"
+}
+
+// Subjects follow `area: summary` (any lowercase area), plus the subjects git
+// itself writes for merges, reverts and autosquash commits.
+local commitMsg: Step = new Step {
+  check = #"""
+    head -n1 {{ commit_msg_file }} | grep -qE '^([a-z0-9][a-z0-9._/-]*: [^ ]|Merge |Revert "|(fixup|squash|amend)! )' || {
+      echo 'commit subject must look like "area: summary" (e.g. "laptop: fix suspend")' >&2
+      exit 1
+    }
+    """#
+}
+
+// Fast per-file checks shared by pre-commit, `hk fix` and `hk check`.
+local fileSteps = new Mapping<String, Step> {
+  ["trailing-whitespace"] = Builtins.trailing_whitespace
+  ["newlines"] = Builtins.newlines
+  ["merge-conflict"] = Builtins.check_merge_conflict
+  ["zsh-syntax"] = zshSyntax
+  ["shellcheck"] = shellcheck
+  ["yamllint"] = yamllint
+}
+
 hooks {
   ["pre-commit"] {
+    fix = true
     stash = "git"
     steps {
       ["gitleaks-staged"] = gitleaksStaged
+      ...fileSteps
+    }
+  }
+  ["commit-msg"] {
+    steps {
+      ["area-prefix"] = commitMsg
     }
   }
   ["pre-push"] {
     steps {
       ["gitleaks-history"] = gitleaksHistory
+      ["ansible-syntax"] = ansibleSyntax
     }
+  }
+  ["fix"] {
+    fix = true
+    steps = fileSteps
   }
   ["check"] {
     steps {
+      ...fileSteps
       ["gitleaks-history"] = gitleaksHistory
+      ["ansible-syntax"] = ansibleSyntax
     }
   }
 }

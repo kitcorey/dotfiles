@@ -1,0 +1,5 @@
+extends: relaxed
+
+rules:
+  # Long URLs, checksums and shell one-liners in tasks; wrapping them hurts.
+  line-length: disable
