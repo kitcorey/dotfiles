@@ -21,27 +21,27 @@ local zshSyntax: Step = new Step {
 
 local shellcheck: Step = (Builtins.shellcheck) {
   glob = List("**/*.sh", "**/*.bash", "bashrc")
-  check = "mise exec -- shellcheck {{ files }}"
 }
 
 // Non-strict: .yamllint extends `relaxed`, whose remaining warnings shouldn't
 // block a commit.
 local yamllint: Step = (Builtins.yamllint) {
   glob = List("site.yml", "roles/**/*.yml", "host_profiles/*.yml", "aichat/*.yaml")
-  check = "mise exec -- yamllint {{ files }}"
+  check = "yamllint {{ files }}"
 }
 
 // Takes ~1.8s, almost all Ansible startup, so it runs per push, not per commit.
 local ansibleSyntax: Step = new Step {
-  glob = List("site.yml", "roles/**", "host_profiles/**")
+  glob = List("site.yml", "ansible.cfg", "roles/**", "host_profiles/**")
   check = "ansible-playbook --syntax-check site.yml"
 }
 
 // Subjects follow `area: summary` (any lowercase area), plus the subjects git
-// itself writes for merges, reverts and autosquash commits.
+// itself writes for merges, reverts, reapplies and autosquash commits. The hook
+// sees the message before git strips it, so skip comment and blank lines first.
 local commitMsg: Step = new Step {
   check = #"""
-    head -n1 {{ commit_msg_file }} | grep -qE '^([a-z0-9][a-z0-9._/-]*: [^ ]|Merge |Revert "|(fixup|squash|amend)! )' || {
+    grep -v '^#' {{ commit_msg_file }} | grep -m1 '[^[:space:]]' | grep -qE '^([a-z0-9][a-z0-9._/-]*: [^ ]|Merge |(Revert|Reapply) "|(fixup|squash|amend)! )' || {
       echo 'commit subject must look like "area: summary" (e.g. "laptop: fix suspend")' >&2
       exit 1
     }
