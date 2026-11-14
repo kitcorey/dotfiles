@@ -17,12 +17,10 @@ ansible-playbook site.yml --ask-become-pass
 ```
 
 On Ubuntu 25.10+, Ansible's become doesn't work with the default `sudo-rs`
-([ansible#85837](https://github.com/ansible/ansible/issues/85837)); use the
-classic sudo instead:
-
-```bash
-ANSIBLE_BECOME_EXE=sudo.ws ansible-playbook site.yml --ask-become-pass
-```
+([ansible#85837](https://github.com/ansible/ansible/issues/85837)), so
+`site.yml` automatically uses the classic sudo (`/usr/bin/sudo.ws`) wherever
+it's installed. If become tasks time out waiting for a password prompt,
+`sudo.ws` is probably missing; install it with `apt install sudo`.
 
 Add `--check --diff` for a dry run.
 

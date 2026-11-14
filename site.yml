@@ -11,6 +11,11 @@
     # land on the system python — so a hard pin would be wrong for one of them.
     # auto_silent keeps that per-context discovery and just suppresses the note.
     ansible_python_interpreter: auto_silent
+    # Ubuntu 25.10+ defaults to sudo-rs, which ansible's become can't drive
+    # (ansible#85837): it ignores the custom prompt ansible waits for, so
+    # become times out. Use the original sudo where it's installed as sudo.ws.
+    # `is exists` checks the controller, which is this machine (localhost only).
+    ansible_become_exe: "{{ 'sudo.ws' if '/usr/bin/sudo.ws' is exists else 'sudo' }}"
   # Disable hk git hooks during provisioning. The symlinked ~/.gitconfig
   # registers config-based hooks (post-checkout, etc.) that run `mise x -- hk`,
   # but `hk` isn't installed until the `mise install` task -- so any git clone/
