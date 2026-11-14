@@ -13,3 +13,7 @@ disabled = false
 
 [gcloud]
 format = 'on [$symbol$project]($style) '
+
+[[battery.display]]
+threshold = 20
+style = 'red bold'
