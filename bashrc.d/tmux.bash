@@ -10,11 +10,12 @@
 #
 # xterm-16color is not available on all systems.  It is currently
 # installed in $HOME/.terminfo
-if [ -z $TMUX ] && { [ "$COLORTERM" = "gnome-terminal" ] || [ "$COLORTERM" = "xfce4-terminal" ]; }
+if [ -z "$TMUX" ] && { [ "$COLORTERM" = "gnome-terminal" ] || [ "$COLORTERM" = "xfce4-terminal" ]; }
 then
     export TERM=xterm-16color
 fi
 
 # Automatically reattach to an existing session when running tmux
 tmux_path=$(type -P tmux)
+# shellcheck disable=SC2139 # resolve the tmux path once, at load time
 alias tmux="$tmux_path attach || $tmux_path new"
