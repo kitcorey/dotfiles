@@ -12,7 +12,7 @@ let mapleader = " "
 "Loaded by lazy.vim via plugins/vim.lua in neovim
 if !has('nvim')
   call plug#begin()
-  
+
   "The following require vim version >= 7.0
   if v:version >= 700
       Plug 'nvie/vim-flake8'
@@ -231,7 +231,7 @@ endif
 " Enable syntax highlighting
 syntax enable
 
-"Turn off automatic indentation for perl and python files when using # 
+"Turn off automatic indentation for perl and python files when using #
 "for comments
 autocmd BufRead *.py inoremap # X<c-h>#
 autocmd BufRead *.pl inoremap # X<c-h>#
