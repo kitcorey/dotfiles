@@ -2,7 +2,8 @@
 # settings.json is also written by Claude Code itself (/config, permission
 # approvals, effort level), so don't own the whole file: merge in just the
 # statusLine key and leave everything else as Claude last saved it.
-# The script needs jq (installed above).
+# The script needs jq, from the base packages in packages.yml (not run by
+# `-t claude`; see the README's note on tags).
 # sort_keys/ensure_ascii match how Claude writes the file, so a no-op merge
 # leaves it byte-identical.
 - name: Ensure ~/.claude exists
