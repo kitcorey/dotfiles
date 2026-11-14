@@ -191,3 +191,27 @@
     - trackpoint_scroll_method | default('', true) | length == 0
     - ansible_facts['system'] == 'Linux'
   notify: Update dconf databases (laptop)
+
+# --- Multi-homed ARP ---------------------------------------------------------
+- name: Stop ARP flux between interfaces on the same subnet (sysctl)
+  copy:
+    src: 90-arp-multihomed.conf
+    dest: /etc/sysctl.d/90-arp-multihomed.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - multihomed_arp_fix | bool
+    - ansible_facts['system'] == 'Linux'
+  notify: Load multi-homed ARP sysctl settings (laptop)
+
+- name: Remove multi-homed ARP sysctl drop-in
+  file:
+    path: /etc/sysctl.d/90-arp-multihomed.conf
+    state: absent
+  become: true
+  when:
+    - not (multihomed_arp_fix | bool)
+    - ansible_facts['system'] == 'Linux'
+  notify: Reset multi-homed ARP sysctl settings (laptop)

@@ -15,5 +15,9 @@ fl1100_no_autosuspend: true
 # Scroll by holding the TrackPoint's middle button.
 trackpoint_scroll_method: on-button-down
 
+# Ethernet + AX210 Wi-Fi on the same LAN: stop ARP flux so the wired
+# connection gets its routes.
+multihomed_arp_fix: true
+
 # Echo Dot udev rules.
 firebreak: true

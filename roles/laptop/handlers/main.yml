@@ -15,3 +15,14 @@
 - name: Update dconf databases (laptop)
   command: dconf update
   become: true
+
+# Loads only our drop-in, so runtime values set elsewhere are left alone.
+- name: Load multi-homed ARP sysctl settings (laptop)
+  command: sysctl -p /etc/sysctl.d/90-arp-multihomed.conf
+  become: true
+
+# Deleting the drop-in doesn't change values already loaded, so set them back
+# to the kernel defaults now instead of waiting for a reboot.
+- name: Reset multi-homed ARP sysctl settings (laptop)
+  command: sysctl -w net.ipv4.conf.all.arp_ignore=0 net.ipv4.conf.all.arp_announce=0
+  become: true

@@ -24,3 +24,10 @@ fl1100_no_autosuspend: false
 # system-wide dconf default (/etc/dconf/db/local.d), so a value set with
 # gsettings overrides it. Empty means no default is written (and removes ours).
 trackpoint_scroll_method: ''
+
+# For hosts with more than one interface on the same subnet (e.g. Ethernet +
+# Wi-Fi): make each interface answer ARP only for its own addresses. Without
+# this, the other interface answers for it, NetworkManager sees an address
+# conflict with the host itself, and the wired connection comes up without
+# routes. Writes /etc/sysctl.d/90-arp-multihomed.conf.
+multihomed_arp_fix: false
