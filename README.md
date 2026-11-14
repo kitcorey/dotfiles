@@ -26,6 +26,17 @@ ANSIBLE_BECOME_EXE=sudo.ws ansible-playbook site.yml --ask-become-pass
 
 Add `--check --diff` for a dry run.
 
+Each role has a tag with its own name (`dotfiles`, `nfs_mounts`, `laptop`,
+`firebreak`), so you can run a single piece on its own:
+
+```bash
+ansible-playbook site.yml -t laptop,firebreak --ask-become-pass
+ansible-playbook site.yml --skip-tags dotfiles --ask-become-pass
+```
+
+Host profiles and `local.yml` still load under `-t` (those tasks are tagged
+`always`). `--list-tags` shows the tags.
+
 To also install RVM:
 
 ```bash

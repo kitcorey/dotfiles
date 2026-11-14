@@ -18,15 +18,20 @@
   # hooks' own opt-out; tools still get hk installed for normal interactive use.
   environment:
     HK: "0"
+  # Every role has a tag of its own name, so one can run alone:
+  #   ansible-playbook site.yml -t laptop
+  # The pre_tasks are tagged `always` so host vars still load under -t.
   pre_tasks:
     # Committed per-host profile, keyed by short hostname. Holds machine
     # settings that are fine to publish (laptop power settings, udev rules) so
     # they survive a reinstall. Loaded before local.yml, so local.yml wins.
     - name: Check if a host profile exists
+      tags: always
       stat:
         path: "{{ playbook_dir }}/host_profiles/{{ ansible_facts['hostname'] }}.yml"
       register: host_profile_file
     - name: Load host profile if present
+      tags: always
       include_vars:
         file: "{{ playbook_dir }}/host_profiles/{{ ansible_facts['hostname'] }}.yml"
       when: host_profile_file.stat.exists
@@ -36,15 +41,17 @@
     # all machines. Using stat + `when` (not `ignore_errors`) so a malformed
     # local.yml still fails loudly instead of silently reverting to defaults.
     - name: Check if host-local vars file exists
+      tags: always
       stat:
         path: "{{ user_home }}/.config/dotfiles/local.yml"
       register: local_vars_file
     - name: Load host-local vars if present
+      tags: always
       include_vars:
         file: "{{ user_home }}/.config/dotfiles/local.yml"
       when: local_vars_file.stat.exists
   roles:
-    - dotfiles
-    - nfs_mounts
-    - laptop
-    - firebreak
+    - { role: dotfiles, tags: dotfiles }
+    - { role: nfs_mounts, tags: nfs_mounts }
+    - { role: laptop, tags: laptop }
+    - { role: firebreak, tags: firebreak }
